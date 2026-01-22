@@ -3,82 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Up-T : Station Orbitale Complète</title>
+    <title>Up-T Phase 9 : Cloud Sync</title>
     <style>
-        :root { --primary: #38bdf8; --bg: #020617; --card: #1e293b; --star: #f59e0b; --success: #22c55e; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        :root { --primary: #38bdf8; --bg: #020617; --card: #1e293b; --success: #22c55e; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        header { width: 100%; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-bottom: 1px solid #334155; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10; }
-        .logo { font-weight: 900; color: var(--primary); font-size: 24px; letter-spacing: -1px; }
-        .profile-icon { width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; color: var(--bg); transition: 0.3s; }
-
-        .container { background: var(--card); padding: 30px; border-radius: 24px; width: 90%; max-width: 450px; margin-top: 30px; border: 1px solid #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        /* DESIGN PREMIUM */
+        header { width: 100%; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-bottom: 1px solid #334155; }
+        .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 10px var(--success); }
         
-        input, select { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--primary); color: var(--bg); font-weight: 800; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .vote-btn { background: var(--success); margin-top: 20px; font-size: 1.5rem; }
+        .container { background: var(--card); padding: 30px; border-radius: 24px; width: 90%; max-width: 450px; margin-top: 30px; border: 1px solid #334155; }
+        
+        .cloud-badge { background: #0f172a; padding: 5px 12px; border-radius: 20px; font-size: 10px; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px; display: inline-block; }
 
-        /* TABLEAU DE LA PHASE 3 RE-INTÉGRÉ */
-        .admin-section { width: 100%; margin-top: 30px; border-top: 1px solid #334155; padding-top: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th { text-align: left; color: #94a3b8; padding-bottom: 10px; }
-        td { padding: 10px 0; border-bottom: 1px solid #0f172a; }
+        button { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--primary); color: var(--bg); font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .vote-btn { background: var(--success); font-size: 1.8rem; height: 100px; width: 100px; border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4); }
 
-        #profile-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; }
-        .profile-card { background: #1e293b; padding: 40px; border-radius: 32px; width: 85%; max-width: 350px; text-align: center; border: 1px solid var(--primary); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        th { text-align: left; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        td { padding: 12px 0; border-bottom: 1px solid #0f172a; }
+        
+        /* ANIMATION */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .syncing { animation: pulse 1s infinite; }
     </style>
 </head>
 <body onload="initApp()">
 
     <header>
-        <div class="logo">UP-T</div>
-        <div id="user-icon" class="profile-icon" onclick="toggleProfile()" style="display:none;">?</div>
+        <div style="font-weight: 900; color: var(--primary);">UP-T NETWORK</div>
+        <div style="font-size: 12px; color: #94a3b8;"><span class="status-dot"></span> CLOUD CONNECTED</div>
     </header>
 
     <div id="auth-zone" class="container">
-        <h2 style="text-align: center;">Configuration</h2>
-        <input type="text" id="username" placeholder="Pseudo du Pionnier">
-        <select id="plan">
-            <option value="1">Novice (Gratuit)</option>
-            <option value="10">Pro (5€/mois)</option>
-            <option value="20">Star (20€/mois)</option>
+        <h2 style="text-align: center;">Identifiant Réseau</h2>
+        <input type="text" id="username" placeholder="Pseudo" style="width:100%; padding:15px; margin:10px 0; border-radius:10px; border:1px solid #334155; background:#0f172a; color:white; box-sizing:border-box;">
+        <select id="plan" style="width:100%; padding:15px; margin:10px 0; border-radius:10px; border:1px solid #334155; background:#0f172a; color:white;">
+            <option value="1">Novice (x1)</option>
+            <option value="10">Pro (x10)</option>
+            <option value="20">Star (x20)</option>
         </select>
-        <button onclick="login()">Activer le Profil</button>
+        <button onclick="login()">REJOINDRE LE CLOUD</button>
     </div>
 
-    <div id="app-zone" class="container" style="display:none;">
-        <div id="main-val" style="font-size: 4rem; text-align: center; color: var(--primary); font-weight: 900;">0</div>
-        <button class="vote-btn" onclick="vote()">VOTER ⚡</button>
-
-        <div class="admin-section">
-            <h4 style="margin:0;">Registre Local des Sessions</h4>
-            <table id="log-table">
-                <thead>
-                    <tr><th>Pilote</th><th>Niveau</th><th>Points</th></tr>
-                </thead>
-                <tbody id="log-body">
-                    </tbody>
+    <div id="app-zone" class="container" style="display:none; text-align:center;">
+        <div class="cloud-badge">SYNC ENGINE v1.0 ACTIVE</div>
+        <div id="welcome-msg" style="color:#94a3b8;"></div>
+        <div id="main-val" style="font-size: 5rem; font-weight: 900; color: var(--primary); margin: 10px 0;">0</div>
+        
+        <div class="vote-btn" onclick="vote()">⚡</div>
+        
+        <div style="margin-top: 30px; text-align: left;">
+            <h4 style="color:var(--primary);">Classement en Temps Réel</h4>
+            <table>
+                <thead><tr><th>Pilote</th><th>Niveau</th><th>Score</th></tr></thead>
+                <tbody id="leaderboard"></tbody>
             </table>
         </div>
-    </div>
-
-    <div id="profile-modal">
-        <div class="profile-card">
-            <h2 id="p-name"></h2>
-            <p id="p-rank" style="color:var(--primary);"></p>
-            <button onclick="toggleProfile()" style="background:transparent; border:1px solid #334155; color:white;">Fermer</button>
-            <button onclick="resetAll()" style="margin-top:20px; color:#ef4444; background:none; border:none; text-decoration:underline;">Réinitialiser</button>
-        </div>
+        <button onclick="reset()" style="background:none; color:#ef4444; font-size:10px; margin-top:20px; border:none; text-decoration:underline;">Déconnexion</button>
     </div>
 
     <script>
         let user = { name: "", power: 1, score: 0 };
+        // Simulation de données provenant d'autres utilisateurs (Cloud)
+        let cloudData = [
+            { name: "Elon_V", rank: "STAR", score: 1250 },
+            { name: "Mars_Pioneer", rank: "PRO", score: 450 }
+        ];
 
         function initApp() {
-            const saved = localStorage.getItem('upt_data');
+            const saved = localStorage.getItem('upt_cloud_session');
             if (saved) {
                 user = JSON.parse(saved);
-                renderApp();
+                showApp();
             }
         }
 
@@ -88,45 +85,51 @@
             if(!name) return;
             user = { name: name, power: power, score: 0 };
             save();
-            renderApp();
+            showApp();
         }
 
         function vote() {
             user.score += user.power;
             save();
-            renderApp();
+            updateDisplay();
+            // Effet visuel de synchro
+            const badge = document.querySelector('.cloud-badge');
+            badge.innerText = "UPLOADING DATA...";
+            setTimeout(() => { badge.innerText = "SYNC ENGINE v1.0 ACTIVE"; }, 500);
         }
 
         function save() {
-            localStorage.setItem('upt_data', JSON.stringify(user));
+            localStorage.setItem('upt_cloud_session', JSON.stringify(user));
         }
 
-        function renderApp() {
+        function showApp() {
             document.getElementById('auth-zone').style.display = 'none';
             document.getElementById('app-zone').style.display = 'block';
-            document.getElementById('user-icon').style.display = 'flex';
-            document.getElementById('user-icon').innerText = user.name.charAt(0).toUpperCase();
+            updateDisplay();
+        }
+
+        function updateDisplay() {
             document.getElementById('main-val').innerText = user.score;
+            document.getElementById('welcome-msg').innerText = "Pilote : " + user.name;
             
-            // Mise à jour du tableau "Phase 3"
-            const body = document.getElementById('log-body');
-            body.innerHTML = `<tr>
-                <td>${user.name}</td>
-                <td>${user.power === 20 ? 'STAR' : (user.power === 10 ? 'PRO' : 'NOVICE')}</td>
-                <td>${user.score}</td>
-            </tr>`;
+            const table = document.getElementById('leaderboard');
+            const myRank = user.power === 20 ? "STAR" : (user.power === 10 ? "PRO" : "NOVICE");
+            
+            // On combine tes données avec celles du "Cloud"
+            let allData = [...cloudData, { name: user.name + " (Moi)", rank: myRank, score: user.score }];
+            allData.sort((a, b) => b.score - a.score);
 
-            document.getElementById('p-name').innerText = user.name;
-            document.getElementById('p-rank').innerText = "Puissance x" + user.power;
+            table.innerHTML = allData.map(p => `
+                <tr style="${p.name.includes('(Moi)') ? 'color:var(--primary); font-weight:bold;' : ''}">
+                    <td>${p.name}</td>
+                    <td>${p.rank}</td>
+                    <td>${p.score}</td>
+                </tr>
+            `).join('');
         }
 
-        function toggleProfile() {
-            const modal = document.getElementById('profile-modal');
-            modal.style.display = (modal.style.display === 'flex' ? 'none' : 'flex');
-        }
-
-        function resetAll() {
-            localStorage.removeItem('upt_data');
+        function reset() {
+            localStorage.removeItem('upt_cloud_session');
             location.reload();
         }
     </script>
