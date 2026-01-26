@@ -84,67 +84,52 @@
         <section class="screen"><h1>TOP_10</h1></section>
     </div>
 
-    <script>
-        let cur = 1;
-        const v = document.getElementById('main-viewport');
+    <script type="module">
+        // 1. On importe tout ce qu'il nous faut d'un coup
+        import { doc, updateDoc, increment, onSnapshot, getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        function init() {
-            // On centre sur la page du milieu (Le Carrosse)
-            v.style.transform = `translateX(-100vw)`;
+        // 2. Fonction pour écouter les votes en temps réel
+        function listenToVotes() {
+            if (!window.db) return;
+            const docRef = doc(window.db, "challenges", "week_01");
+
+            onSnapshot(docRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const currentVotes = snapshot.data().votes;
+                    const label = document.getElementById('vote-count');
+                    if(label) label.innerText = currentVotes;
+                    console.log("📡 Synchro Cloud : " + currentVotes + " votes");
+                }
+            });
         }
 
-        // --- LA FONCTION DE VOTE CORRIGÉE ---
-        async function castVote() {
-            console.log("Tentative d'envoi du vote...");
-
-            // Vérification : est-ce que Firebase est bien chargé ?
+        // 3. La fonction de vote accessible par le bouton
+        window.castVote = async function() {
+            console.log("Tentative d'envoi...");
             if (!window.db) {
-                console.error("Erreur : La base de données n'est pas initialisée.");
-                alert("Système non prêt. Vérifie tes clés API en haut du fichier.");
+                alert("Système non prêt.");
                 return;
             }
 
             try {
-                // On importe les outils Firebase nécessaires depuis le module global
-                // Note : On utilise window.db que tu as défini dans ton premier script
-                const { doc, updateDoc, increment } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
-                
                 const docRef = doc(window.db, "challenges", "week_01");
-
                 await updateDoc(docRef, {
                     votes: increment(1)
                 });
-
-                // Si on arrive ici, ça a marché !
-                console.log("🔥 SUCCÈS ! Vote enregistré dans le Cloud.");
-                
-                let countLabel = document.getElementById('vote-count');
-                countLabel.innerText = parseInt(countLabel.innerText) + 1;
-
+                console.log("🔥 Vote envoyé !");
             } catch (error) {
-                console.error("❌ ERREUR FIREBASE :", error);
-                alert("Le signal a échoué. Vérifie que la collection 'challenges' existe dans Firebase.");
+                console.error("Erreur :", error);
             }
-        }// --- FONCTION POUR ÉCOUTER LE SCORE EN DIRECT ---
-import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        };
 
-function listenToVotes() {
-    const docRef = doc(window.db, "challenges", "week_01");
-
-    // Cette fonction surveille le document "week_01" 24h/24
-    onSnapshot(docRef, (doc) => {
-        if (doc.exists()) {
-            const currentVotes = doc.data().votes;
-            // On met à jour le texte sur ton site avec la vraie valeur du Cloud
-            document.getElementById('vote-count').innerText = currentVotes;
-            console.log("Mise à jour Cloud reçue : " + currentVotes);
-        }
-    });
-}
-
-// On lance l'écoute dès que la page est prête
-// Ajoute cette ligne dans ta fonction init() ou juste ici :
-setTimeout(listenToVotes, 1000);
+        // 4. Lancement au démarrage
+        // On attend un tout petit peu que Firebase s'initialise en haut
+        setTimeout(() => {
+            listenToVotes();
+            // Centrer le carrosse au démarrage
+            const v = document.getElementById('main-viewport');
+            if(v) v.style.transform = `translateX(-100vw)`;
+        }, 1000);
     </script>
 </body>
 </html>
