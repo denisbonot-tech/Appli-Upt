@@ -91,17 +91,28 @@
         }
 
         async function castVote() {
-            // Pour l'instant on simule l'ID de la photo
-            const photoId = "mission_week_01";
-            console.log("Vote enregistré pour " + photoId);
-            
-            // Animation visuelle immédiate
-            let countLabel = document.getElementById('vote-count');
-            countLabel.innerText = parseInt(countLabel.innerText) + 1;
-            
-            // Connexion Firestore (on prépare l'écriture réelle)
-            // On fera le lien exact une fois tes premières données créées
-        }
+    console.log("Tentative d'envoi du vote au Cloud...");
+    
+    // 1. On définit l'adresse exacte dans la base de données
+    // Vérifie bien que dans Firebase tu as créé la collection "challenges" et le doc "week_01"
+    const docRef = doc(window.db, "challenges", "week_01");
+
+    try {
+        // 2. On envoie l'ordre d'incrémentation (+1) à Firebase
+        await updateDoc(docRef, {
+            votes: increment(1)
+        });
+        
+        // 3. Si ça marche, on met à jour l'affichage sur ton téléphone
+        let countLabel = document.getElementById('vote-count');
+        countLabel.innerText = parseInt(countLabel.innerText) + 1;
+        
+        console.log("🔥 SUCCÈS : Firebase a reçu le signal !");
+    } catch (error) {
+        console.error("❌ ERREUR : Le signal n'est pas passé.", error.message);
+        alert("Erreur de connexion : " + error.message);
+    }
+}
     </script>
 </body>
 </html>
