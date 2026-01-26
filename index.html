@@ -3,15 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T V2.1 | Pulse Mode</title>
-    
+    <title>Up-T Network | Prototype 5-Axes</title>
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #0a0a0a;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: white;
+        }
+
+        /* LE CONTENEUR GÉANT EN CROIX */
+        #main-viewport {
+            display: flex;
+            flex-direction: column; /* Aligne Top, Middle, Bottom */
+            width: 300vw;
+            height: 300vh;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            transform: translate(-100vw, -100vh); /* Démarre au centre */
+        }
+
+        /* LA RANGÉE HORIZONTALE DU MILIEU */
+        .middle-row {
+            display: flex;
+            flex-direction: row; /* Aligne Missions, Carrosse, Top10 */
+            width: 300vw;
+            height: 100vh;
+        }
+
+        /* CHAQUE PAGE */
+        .page {
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            text-align: center;
+        }
+
+        /* STYLE DU CARROSSE CENTRAL */
+        .story-container {
+            width: 85%;
+            height: 75%;
+            background: #1a1a1a;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .story-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .vote-overlay {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #vote-count {
+            font-size: 4rem;
+            font-weight: 900;
+            text-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .vote-btn {
+            font-size: 3rem;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s;
+        }
+
+        .vote-btn:active { transform: scale(0.9); }
+
+        /* AUTRES PAGES TITRES */
+        h1 { font-size: 3rem; letter-spacing: 5px; opacity: 0.5; }
+
+        /* INDICATEURS DE NAVIGATION (ASTUCE COACH) */
+        .nav-hint {
+            position: fixed;
+            font-size: 0.8rem;
+            opacity: 0.3;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-viewport">
+        <div class="page top"><h1>PROFIL_USER</h1></div>
+
+        <div class="middle-row">
+            <div class="page left"><h1>MISSIONS</h1></div>
+            
+            <div class="page center">
+                <div class="story-container">
+                    <img class="story-img" src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=800" alt="Carrosse">
+                    <div class="vote-overlay">
+                        <span id="vote-count">0</span>
+                        <button class="vote-btn" onclick="castVote()">⚡️</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page right">
+                <h1>TOP_10</h1>
+                <div style="font-size: 1.5rem; color: var(--neon-blue);">
+                    1. Mission_Week_01 : <span id="rank-score">0</span> pts
+                </div>
+            </div>
+        </div>
+
+        <div class="page bottom"><h1>SHOP_&_DATA</h1></div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        
-        const firebaseConfig = {
+        import { getFirestore, doc, updateDoc, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk",
+        // CONFIGURATION : REMPLACE CES LIGNES PAR TES CLÉS
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk",
 
   authDomain: "up-t-network.firebaseapp.com",
 
@@ -29,107 +166,43 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        window.db = db; // On rend la DB accessible pour nos fonctions
-        console.log("Système de vote armé !");
-    </script>
+        window.db = db;
 
-    <style>
-        :root { --bg: #000000; --accent: #ffffff; }
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', sans-serif; color: white; }
-        
-        header { position: fixed; top: 0; width: 100%; padding: 25px; z-index: 100; text-align: center; font-weight: 100; letter-spacing: 12px; font-size: 20px; }
-        
-        .viewport { display: flex; width: 300vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-        .screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        // ÉCOUTE EN TEMPS RÉEL
+        const docRef = doc(db, "challenges", "week_01");
+        onSnapshot(docRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const votes = snapshot.data().votes;
+                document.getElementById('vote-count').innerText = votes;
+                document.getElementById('rank-score').innerText = votes;
+            }
+        });
 
-        /* LE CARROSSE DESIGN */
-        .story-container { 
-            width: 88%; height: 60%; border: 1px solid #222; background: #050505; 
-            position: relative; overflow: hidden;
-            box-shadow: 0 0 50px rgba(255,255,255,0.03);
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        /* BOUTON VOTE (L'ÉCLAIR) */
-        .vote-zone { position: absolute; bottom: 20px; right: 20px; text-align: center; }
-        .btn-vote { 
-            background: white; border: none; width: 60px; height: 60px; border-radius: 50%;
-            cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px rgba(255,255,255,0.4); transition: 0.2s;
-        }
-        .btn-vote:active { transform: scale(1.3); filter: brightness(1.5); }
-
-        .btn-main { background: #fff; color: #000; border: none; padding: 15px 40px; font-weight: 900; letter-spacing: 4px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); margin-top: 20px; }
-    </style>
-</head>
-<body onload="init()">
-
-    <header>UP — T</header>
-
-    <div class="viewport" id="main-viewport">
-        <section class="screen"><h1>MISSIONS</h1></section>
-        
-        <section class="screen">
-            <div class="story-container">
-                <div id="pl-text" style="opacity: 0.2; font-weight: 100;">CONCEPT_VIEW_01</div>
-                
-                <div class="vote-zone">
-                    <button class="btn-vote" onclick="castVote()">⚡</button>
-                    <p id="vote-count" style="font-size: 12px; margin-top: 5px; font-weight: 900;">0</p>
-                </div>
-            </div>
-            <button class="btn-main">POSTER</button>
-        </section>
-
-        <section class="screen"><h1>TOP_10</h1></section>
-    </div>
-
-    <script type="module">
-        // 1. On importe tout ce qu'il nous faut d'un coup
-        import { doc, updateDoc, increment, onSnapshot, getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // 2. Fonction pour écouter les votes en temps réel
-        function listenToVotes() {
-            if (!window.db) return;
-            const docRef = doc(window.db, "challenges", "week_01");
-
-            onSnapshot(docRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const currentVotes = snapshot.data().votes;
-                    const label = document.getElementById('vote-count');
-                    if(label) label.innerText = currentVotes;
-                    console.log("📡 Synchro Cloud : " + currentVotes + " votes");
-                }
-            });
-        }
-
-        // 3. La fonction de vote accessible par le bouton
+        // FONCTION DE VOTE
         window.castVote = async function() {
-            console.log("Tentative d'envoi...");
-            if (!window.db) {
-                alert("Système non prêt.");
-                return;
-            }
-
             try {
-                const docRef = doc(window.db, "challenges", "week_01");
-                await updateDoc(docRef, {
-                    votes: increment(1)
-                });
-                console.log("🔥 Vote envoyé !");
-            } catch (error) {
-                console.error("Erreur :", error);
-            }
+                await updateDoc(docRef, { votes: increment(1) });
+            } catch (e) { console.error("Erreur vote:", e); }
         };
-
-        // 4. Lancement au démarrage
-        // On attend un tout petit peu que Firebase s'initialise en haut
-        setTimeout(() => {
-            listenToVotes();
-            // Centrer le carrosse au démarrage
-            const v = document.getElementById('main-viewport');
-            if(v) v.style.transform = `translateX(-100vw)`;
-        }, 1000);
     </script>
+
+    <script>
+        let posX = 1; 
+        let posY = 1;
+        
+        function move() {
+            const v = document.getElementById('main-viewport');
+            v.style.transform = `translate(${-posX * 100}vw, ${-posY * 100}vh)`;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if(e.key === "ArrowRight" && posX < 2) posX++;
+            if(e.key === "ArrowLeft" && posX > 0) posX--;
+            if(e.key === "ArrowDown" && posY < 2) posY++;
+            if(e.key === "ArrowUp" && posY > 0) posY--;
+            move();
+        });
+    </script>
+
 </body>
 </html>
