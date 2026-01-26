@@ -125,7 +125,26 @@
                 console.error("❌ ERREUR FIREBASE :", error);
                 alert("Le signal a échoué. Vérifie que la collection 'challenges' existe dans Firebase.");
             }
+        }// --- FONCTION POUR ÉCOUTER LE SCORE EN DIRECT ---
+import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+function listenToVotes() {
+    const docRef = doc(window.db, "challenges", "week_01");
+
+    // Cette fonction surveille le document "week_01" 24h/24
+    onSnapshot(docRef, (doc) => {
+        if (doc.exists()) {
+            const currentVotes = doc.data().votes;
+            // On met à jour le texte sur ton site avec la vraie valeur du Cloud
+            document.getElementById('vote-count').innerText = currentVotes;
+            console.log("Mise à jour Cloud reçue : " + currentVotes);
         }
+    });
+}
+
+// On lance l'écoute dès que la page est prête
+// Ajoute cette ligne dans ta fonction init() ou juste ici :
+setTimeout(listenToVotes, 1000);
     </script>
 </body>
 </html>
