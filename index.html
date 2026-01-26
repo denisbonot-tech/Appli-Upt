@@ -113,9 +113,13 @@
             
             <div class="page center">
                 <div class="story-container">
-                    <div class="media-box">
-                        <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800" id="carrosse-media">
-                    </div>
+                    <div class="media-box" onclick="document.getElementById('file-input').click()">
+    <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800" id="carrosse-media">
+    
+    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="previewImage(event)">
+    
+    <div style="position:absolute; top:10px; right:10px; background:var(--electric-yellow); color:black; padding:5px 10px; font-weight:bold; border-radius:5px; font-size:0.7rem;">POSTER</div>
+</div>
                     <div class="data-box">
                         <div id="vote-count">0</div>
                         <button class="vote-circle" onclick="castVote()">
@@ -195,6 +199,15 @@
             }
             refresh();
         });
+        function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        const output = document.getElementById('carrosse-media');
+        output.src = reader.result; // Change l'image sur ton écran instantanément
+    };
+    reader.readAsDataURL(event.target.files[0]);
+    console.log("🔥 Image chargée localement ! Demain, on l'envoie sur le Cloud.");
+}
     </script>
 </body>
 </html>
