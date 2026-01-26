@@ -86,33 +86,46 @@
 
     <script>
         let cur = 1;
+        const v = document.getElementById('main-viewport');
+
         function init() {
-            document.getElementById('main-viewport').style.transform = `translateX(-100vw)`;
+            // On centre sur la page du milieu (Le Carrosse)
+            v.style.transform = `translateX(-100vw)`;
         }
 
+        // --- LA FONCTION DE VOTE CORRIGÉE ---
         async function castVote() {
-    console.log("Tentative d'envoi du vote au Cloud...");
-    
-    // 1. On définit l'adresse exacte dans la base de données
-    // Vérifie bien que dans Firebase tu as créé la collection "challenges" et le doc "week_01"
-    const docRef = doc(window.db, "challenges", "week_01");
+            console.log("Tentative d'envoi du vote...");
 
-    try {
-        // 2. On envoie l'ordre d'incrémentation (+1) à Firebase
-        await updateDoc(docRef, {
-            votes: increment(1)
-        });
-        
-        // 3. Si ça marche, on met à jour l'affichage sur ton téléphone
-        let countLabel = document.getElementById('vote-count');
-        countLabel.innerText = parseInt(countLabel.innerText) + 1;
-        
-        console.log("🔥 SUCCÈS : Firebase a reçu le signal !");
-    } catch (error) {
-        console.error("❌ ERREUR : Le signal n'est pas passé.", error.message);
-        alert("Erreur de connexion : " + error.message);
-    }
-}
+            // Vérification : est-ce que Firebase est bien chargé ?
+            if (!window.db) {
+                console.error("Erreur : La base de données n'est pas initialisée.");
+                alert("Système non prêt. Vérifie tes clés API en haut du fichier.");
+                return;
+            }
+
+            try {
+                // On importe les outils Firebase nécessaires depuis le module global
+                // Note : On utilise window.db que tu as défini dans ton premier script
+                const { doc, updateDoc, increment } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                
+                const docRef = doc(window.db, "challenges", "week_01");
+
+                await updateDoc(docRef, {
+                    votes: increment(1)
+                });
+
+                // Si on arrive ici, ça a marché !
+                console.log("🔥 SUCCÈS ! Vote enregistré dans le Cloud.");
+                
+                let countLabel = document.getElementById('vote-count');
+                countLabel.innerText = parseInt(countLabel.innerText) + 1;
+
+            } catch (error) {
+                console.error("❌ ERREUR FIREBASE :", error);
+                alert("Le signal a échoué. Vérifie que la collection 'challenges' existe dans Firebase.");
+            }
+        }
     </script>
 </body>
 </html>
