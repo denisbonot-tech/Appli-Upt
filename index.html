@@ -2,135 +2,105 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Up-T Phase 9 : Cloud Sync</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Up-T V2.1 | Pulse Mode</title>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+
+  apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk",
+
+  authDomain: "up-t-network.firebaseapp.com",
+
+  projectId: "up-t-network",
+
+  storageBucket: "up-t-network.firebasestorage.app",
+
+  messagingSenderId: "1066469813456",
+
+  appId: "1:1066469813456:web:4b660350832ea1d95702d5",
+
+  measurementId: "G-7CSRYYCZWV"
+
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.db = db; // On rend la DB accessible pour nos fonctions
+        console.log("Système de vote armé !");
+    </script>
+
     <style>
-        :root { --primary: #38bdf8; --bg: #020617; --card: #1e293b; --success: #22c55e; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        :root { --bg: #000000; --accent: #ffffff; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', sans-serif; color: white; }
         
-        /* DESIGN PREMIUM */
-        header { width: 100%; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-bottom: 1px solid #334155; }
-        .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 10px var(--success); }
+        header { position: fixed; top: 0; width: 100%; padding: 25px; z-index: 100; text-align: center; font-weight: 100; letter-spacing: 12px; font-size: 20px; }
         
-        .container { background: var(--card); padding: 30px; border-radius: 24px; width: 90%; max-width: 450px; margin-top: 30px; border: 1px solid #334155; }
-        
-        .cloud-badge { background: #0f172a; padding: 5px 12px; border-radius: 20px; font-size: 10px; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px; display: inline-block; }
+        .viewport { display: flex; width: 300vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        button { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--primary); color: var(--bg); font-weight: 800; cursor: pointer; transition: 0.3s; }
-        .vote-btn { background: var(--success); font-size: 1.8rem; height: 100px; width: 100px; border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4); }
+        /* LE CARROSSE DESIGN */
+        .story-container { 
+            width: 88%; height: 60%; border: 1px solid #222; background: #050505; 
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 50px rgba(255,255,255,0.03);
+            display: flex; align-items: center; justify-content: center;
+        }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
-        th { text-align: left; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        td { padding: 12px 0; border-bottom: 1px solid #0f172a; }
-        
-        /* ANIMATION */
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        .syncing { animation: pulse 1s infinite; }
+        /* BOUTON VOTE (L'ÉCLAIR) */
+        .vote-zone { position: absolute; bottom: 20px; right: 20px; text-align: center; }
+        .btn-vote { 
+            background: white; border: none; width: 60px; height: 60px; border-radius: 50%;
+            cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(255,255,255,0.4); transition: 0.2s;
+        }
+        .btn-vote:active { transform: scale(1.3); filter: brightness(1.5); }
+
+        .btn-main { background: #fff; color: #000; border: none; padding: 15px 40px; font-weight: 900; letter-spacing: 4px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); margin-top: 20px; }
     </style>
 </head>
-<body onload="initApp()">
+<body onload="init()">
 
-    <header>
-        <div style="font-weight: 900; color: var(--primary);">UP-T NETWORK</div>
-        <div style="font-size: 12px; color: #94a3b8;"><span class="status-dot"></span> CLOUD CONNECTED</div>
-    </header>
+    <header>UP — T</header>
 
-    <div id="auth-zone" class="container">
-        <h2 style="text-align: center;">Identifiant Réseau</h2>
-        <input type="text" id="username" placeholder="Pseudo" style="width:100%; padding:15px; margin:10px 0; border-radius:10px; border:1px solid #334155; background:#0f172a; color:white; box-sizing:border-box;">
-        <select id="plan" style="width:100%; padding:15px; margin:10px 0; border-radius:10px; border:1px solid #334155; background:#0f172a; color:white;">
-            <option value="1">Novice (x1)</option>
-            <option value="10">Pro (x10)</option>
-            <option value="20">Star (x20)</option>
-        </select>
-        <button onclick="login()">REJOINDRE LE CLOUD</button>
-    </div>
-
-    <div id="app-zone" class="container" style="display:none; text-align:center;">
-        <div class="cloud-badge">SYNC ENGINE v1.0 ACTIVE</div>
-        <div id="welcome-msg" style="color:#94a3b8;"></div>
-        <div id="main-val" style="font-size: 5rem; font-weight: 900; color: var(--primary); margin: 10px 0;">0</div>
+    <div class="viewport" id="main-viewport">
+        <section class="screen"><h1>MISSIONS</h1></section>
         
-        <div class="vote-btn" onclick="vote()">⚡</div>
-        
-        <div style="margin-top: 30px; text-align: left;">
-            <h4 style="color:var(--primary);">Classement en Temps Réel</h4>
-            <table>
-                <thead><tr><th>Pilote</th><th>Niveau</th><th>Score</th></tr></thead>
-                <tbody id="leaderboard"></tbody>
-            </table>
-        </div>
-        <button onclick="reset()" style="background:none; color:#ef4444; font-size:10px; margin-top:20px; border:none; text-decoration:underline;">Déconnexion</button>
+        <section class="screen">
+            <div class="story-container">
+                <div id="pl-text" style="opacity: 0.2; font-weight: 100;">CONCEPT_VIEW_01</div>
+                
+                <div class="vote-zone">
+                    <button class="btn-vote" onclick="castVote()">⚡</button>
+                    <p id="vote-count" style="font-size: 12px; margin-top: 5px; font-weight: 900;">0</p>
+                </div>
+            </div>
+            <button class="btn-main">POSTER</button>
+        </section>
+
+        <section class="screen"><h1>TOP_10</h1></section>
     </div>
 
     <script>
-        let user = { name: "", power: 1, score: 0 };
-        // Simulation de données provenant d'autres utilisateurs (Cloud)
-        let cloudData = [
-            { name: "Elon_V", rank: "STAR", score: 1250 },
-            { name: "Mars_Pioneer", rank: "PRO", score: 450 }
-        ];
-
-        function initApp() {
-            const saved = localStorage.getItem('upt_cloud_session');
-            if (saved) {
-                user = JSON.parse(saved);
-                showApp();
-            }
+        let cur = 1;
+        function init() {
+            document.getElementById('main-viewport').style.transform = `translateX(-100vw)`;
         }
 
-        function login() {
-            const name = document.getElementById('username').value;
-            const power = parseInt(document.getElementById('plan').value);
-            if(!name) return;
-            user = { name: name, power: power, score: 0 };
-            save();
-            showApp();
-        }
-
-        function vote() {
-            user.score += user.power;
-            save();
-            updateDisplay();
-            // Effet visuel de synchro
-            const badge = document.querySelector('.cloud-badge');
-            badge.innerText = "UPLOADING DATA...";
-            setTimeout(() => { badge.innerText = "SYNC ENGINE v1.0 ACTIVE"; }, 500);
-        }
-
-        function save() {
-            localStorage.setItem('upt_cloud_session', JSON.stringify(user));
-        }
-
-        function showApp() {
-            document.getElementById('auth-zone').style.display = 'none';
-            document.getElementById('app-zone').style.display = 'block';
-            updateDisplay();
-        }
-
-        function updateDisplay() {
-            document.getElementById('main-val').innerText = user.score;
-            document.getElementById('welcome-msg').innerText = "Pilote : " + user.name;
+        async function castVote() {
+            // Pour l'instant on simule l'ID de la photo
+            const photoId = "mission_week_01";
+            console.log("Vote enregistré pour " + photoId);
             
-            const table = document.getElementById('leaderboard');
-            const myRank = user.power === 20 ? "STAR" : (user.power === 10 ? "PRO" : "NOVICE");
+            // Animation visuelle immédiate
+            let countLabel = document.getElementById('vote-count');
+            countLabel.innerText = parseInt(countLabel.innerText) + 1;
             
-            // On combine tes données avec celles du "Cloud"
-            let allData = [...cloudData, { name: user.name + " (Moi)", rank: myRank, score: user.score }];
-            allData.sort((a, b) => b.score - a.score);
-
-            table.innerHTML = allData.map(p => `
-                <tr style="${p.name.includes('(Moi)') ? 'color:var(--primary); font-weight:bold;' : ''}">
-                    <td>${p.name}</td>
-                    <td>${p.rank}</td>
-                    <td>${p.score}</td>
-                </tr>
-            `).join('');
-        }
-
-        function reset() {
-            localStorage.removeItem('upt_cloud_session');
-            location.reload();
+            // Connexion Firestore (on prépare l'écriture réelle)
+            // On fera le lien exact une fois tes premières données créées
         }
     </script>
 </body>
