@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | Cockpit V4.3</title>
+    <title>Up-T | Control Band V4.4</title>
     <style>
-        :root { --neon-blue: #00f3ff; --bg-dark: #050505; }
+        :root { --neon-blue: #00f3ff; --bg-dark: #050505; --band-gray: #d1d1d1; }
 
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
@@ -14,16 +14,34 @@
             color: white; touch-action: none;
         }
 
-        /* GPS CENTRÉ EN BAS */
-        #nav-gps {
-            position: fixed; bottom: 25px; left: 50%;
-            transform: translateX(-50%);
-            display: grid; grid-template-columns: repeat(3, 15px); gap: 10px;
-            z-index: 1000; padding: 10px;
+        /* BANDEAU DE CONTRÔLE 12PX */
+        #control-band {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            height: 12px; background: var(--band-gray);
+            z-index: 1000; display: flex; justify-content: center; align-items: center;
         }
-        .dot { width: 15px; height: 2px; background: rgba(255,255,255,0.15); transition: 0.4s; }
-        .dot.active { background: white; box-shadow: 0 0 10px white; }
+
+        /* GPS DANS LE BANDEAU */
+        #nav-gps {
+            display: grid; grid-template-columns: repeat(3, 15px); gap: 10px;
+        }
+        .dot { width: 15px; height: 2px; background: rgba(0,0,0,0.2); transition: 0.4s; }
+        .dot.active { background: black; transform: scaleY(1.5); }
         .dot.hide { visibility: hidden; }
+
+        /* BOUTONS RONDS (ATTACHÉS AU BANDEAU) */
+        .round-btn {
+            position: absolute; bottom: 6px; /* Centré à cheval sur le bandeau */
+            width: 50px; height: 50px; background: white;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer; pointer-events: auto; z-index: 1001;
+        }
+        .round-btn svg { width: 22px; height: 22px; fill: black; }
+        .round-btn span { position: absolute; top: -25px; color: white; font-size: 0.7rem; font-weight: 900; }
+
+        .left-btn { left: 20px; }
+        .right-btn { right: 20px; }
 
         /* VIEWPORT NAVIGATION */
         #main-viewport {
@@ -35,68 +53,47 @@
         .middle-row { display: flex; width: 300vw; height: 100vh; }
         .page { width: 100vw; height: 100vh; flex-shrink: 0; display: flex; justify-content: center; align-items: center; position: relative; }
 
-        /* DESIGN CARROSSE PLEIN ÉCRAN */
+        /* CARROSSE PLEIN ÉCRAN */
         .story-container { width: 100vw; height: 100vh; background: #000; position: relative; overflow: hidden; }
         #carrosse-media { width: 100%; height: 100%; object-fit: cover; }
 
-        /* BOUTONS ACTIONS (OVALE) */
-        .action-box {
-            position: absolute; bottom: 70px;
-            background: Black; color: White;
-            padding: 7px 12px; border-radius: 2px;
-            display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 0.9rem;
-            cursor: pointer; pointer-events: auto;
-            min-width: 60px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            text-transform: uppercase;
-        }
-        .action-box span { font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 2px; opacity: 0.6; font-weight: 600; }
-
-        /* POSITIONNEMENT GAUCHE/DROITE */
-        .left-btn { left: 10px; }
-        .right-btn { right: 10px; }
-
-        h1 { font-size: 0.8rem; letter-spacing: 5px; opacity: 0.2; text-transform: uppercase; }
+        h1 { font-size: 1rem; letter-spacing: 8px; opacity: 0.3; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-    <div id="nav-gps">
-        <div class="dot hide"></div> <div id="dot-1-0" class="dot"></div> <div class="dot hide"></div>
-        <div id="dot-0-1" class="dot"></div> <div id="dot-1-1" class="dot active"></div> <div id="dot-2-1" class="dot"></div>
-        <div class="dot hide"></div> <div id="dot-1-2" class="dot"></div> <div class="dot hide"></div>
+    <div id="control-band">
+        <div id="nav-gps">
+            <div class="dot hide"></div> <div id="dot-1-0" class="dot"></div> <div class="dot hide"></div>
+            <div id="dot-0-1" class="dot"></div> <div id="dot-1-1" class="dot active"></div> <div id="dot-2-1" class="dot"></div>
+            <div class="dot hide"></div> <div id="dot-1-2" class="dot"></div> <div class="dot hide"></div>
+        </div>
+
+        <div class="round-btn left-btn" onclick="document.getElementById('file-input').click()">
+            <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4V5zm2 2v10h12V7H6zm3 2h2v2H9V9zm4 0h2v2h-2V9zm-4 4h2v2H9v-2zm4 0h2v2h-2v-2z"/></svg>
+        </div>
+        <input type="file" id="file-input" accept="image/*" style="display:none">
+
+        <div class="round-btn right-btn" onclick="castVote()">
+            <span id="vote-count">0</span>
+            <svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
+        </div>
     </div>
 
     <div id="main-viewport">
         <div class="page top"><h1>Profil</h1></div>
-
         <div class="middle-row">
             <div class="page left"><h1>Missions</h1></div>
-            
             <div class="page center">
                 <div class="story-container">
                     <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800" id="carrosse-media">
-                    
-                    <div class="action-box left-btn" onclick="document.getElementById('file-input').click()">
-                        <span>Photos</span>
-                        <div>Post Now</div>
-                    </div>
-                    <input type="file" id="file-input" accept="image/*" style="display:none">
-
-                    <div class="action-box right-btn" onclick="castVote()">
-                        <span>LIKES Me</span>
-                        <div id="vote-count">0</div>
-                    </div>
                 </div>
             </div>
-
             <div class="page right">
                 <h1>Classement</h1>
-                <div id="rank-score" style="font-size: 4rem; font-weight: 900;">0</div>
+                <div id="rank-score" style="font-size: 5rem; font-weight: 900;">0</div>
             </div>
         </div>
-
         <div class="page bottom"><h1>Boutique</h1></div>
     </div>
 
