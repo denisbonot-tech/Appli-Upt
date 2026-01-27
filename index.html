@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | Flow V4.6</title>
+    <title>Up-T | Fix North V4.7</title>
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #050505; }
 
@@ -14,7 +14,7 @@
             color: white; touch-action: none;
         }
 
-        /* BANDEAU GLASSMORPHISM 60PX */
+        /* BANDEAU GLASSMORPHISM */
         #control-band {
             position: fixed; bottom: 0; left: 0; width: 100%;
             height: 60px; background: rgba(255, 255, 255, 0.1);
@@ -32,26 +32,55 @@
         .round-btn-container { position: absolute; bottom: 10px; display: flex; flex-direction: column; align-items: center; }
         .round-btn { width: 45px; height: 45px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; pointer-events: auto; }
         .round-btn svg { width: 22px; height: 22px; fill: black; }
-        .like-counter { background: white; color: black; font-size: 0.75rem; font-weight: 900; padding: 2px 8px; border-radius: 4px; margin-bottom: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .like-counter { background: white; color: black; font-size: 0.75rem; font-weight: 900; padding: 2px 8px; border-radius: 4px; margin-bottom: 4px; }
 
         .left-side { left: 20px; }
         .right-side { right: 20px; }
 
-        /* VIEWPORT */
+        /* VIEWPORT NAVIGATION */
         #main-viewport { display: flex; flex-direction: column; width: 300vw; height: 300vh; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); transform: translate(-100vw, -100vh); }
         .middle-row { display: flex; width: 300vw; height: 100vh; }
-        .page { width: 100vw; height: 100vh; flex-shrink: 0; display: flex; justify-content: center; align-items: center; position: relative; flex-direction: column; }
+        
+        /* Correction Flexbox pour toutes les pages */
+        .page { 
+            width: 100vw; height: 100vh; flex-shrink: 0; 
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            position: relative; 
+            box-sizing: border-box;
+        }
 
-        /* PROFIL FORM (PAGE NORD) */
-        .profile-card { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 80%; text-align: center; }
-        .profile-card input { background: transparent; border: none; border-bottom: 2px solid white; color: white; font-size: 1.5rem; width: 100%; text-align: center; outline: none; margin: 20px 0; }
-        .btn-prime { background: white; color: black; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 900; cursor: pointer; }
+        /* FICHE PROFIL NORD - VISIBLE ET PROPRE */
+        .profile-card { 
+            background: rgba(255,255,255,0.08); 
+            padding: 40px 20px; 
+            border-radius: 25px; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            width: 85%; 
+            max-width: 400px;
+            text-align: center; 
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+        .profile-card h2 { margin: 0 0 10px 0; font-size: 1.2rem; letter-spacing: 2px; color: var(--neon-blue); }
+        .profile-card p { font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px; }
+        .profile-card input { 
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); 
+            color: white; font-size: 1.2rem; width: 90%; 
+            padding: 12px; border-radius: 10px; text-align: center; outline: none; margin-bottom: 20px; 
+        }
+        .btn-prime { 
+            background: white; color: black; border: none; 
+            padding: 15px 40px; border-radius: 12px; 
+            font-weight: 900; cursor: pointer; width: 90%;
+            text-transform: uppercase;
+        }
 
-        /* CARROSSE PLEIN ÉCRAN */
+        /* CARROSSE */
         .story-container { width: 100vw; height: 100vh; background: #000; position: relative; overflow: hidden; }
         #carrosse-media { width: 100%; height: 100%; object-fit: cover; }
 
-        h1 { font-size: 1rem; letter-spacing: 8px; opacity: 0.3; text-transform: uppercase; margin-bottom: 20px; }
+        h1 { font-size: 0.8rem; letter-spacing: 5px; opacity: 0.3; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -68,7 +97,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
             </div>
         </div>
-        <input type="file" id="file-input" accept="image/*" capture="camera" style="display:none">
+        <input type="file" id="file-input" accept="image/*" style="display:none">
 
         <div class="round-btn-container right-side">
             <div id="vote-count" class="like-counter">0</div>
@@ -80,11 +109,11 @@
 
     <div id="main-viewport">
         <div class="page top">
-            <h1>Profil Pilote</h1>
             <div class="profile-card">
-                <p>IDENTIFIE-TOI POUR POSTER</p>
-                <input type="text" id="username-input" placeholder="TON NOM">
-                <button class="btn-prime" onclick="saveProfile()">VALIDER</button>
+                <h2>VÉRIFICATION</h2>
+                <p>Entre ton nom de pilote pour débloquer le Carrosse.</p>
+                <input type="text" id="username-input" placeholder="EX: ELON_M">
+                <button class="btn-prime" onclick="saveProfile()">ACTIVER LE COMPTE</button>
             </div>
         </div>
 
@@ -95,10 +124,7 @@
                     <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800" id="carrosse-media">
                 </div>
             </div>
-            <div class="page right">
-                <h1>Classement</h1>
-                <div id="rank-score" style="font-size: 5rem; font-weight: 900;">0</div>
-            </div>
+            <div class="page right"><h1>Classement</h1></div>
         </div>
         <div class="page bottom"><h1>Boutique</h1></div>
     </div>
@@ -128,36 +154,32 @@
         const db = getFirestore(app);
         const docRef = doc(db, "challenges", "week_01");
 
-        // État global
         let currentUser = localStorage.getItem('up-t-username');
 
         onSnapshot(docRef, (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
                 document.getElementById('vote-count').innerText = data.votes || 0;
-                document.getElementById('rank-score').innerText = data.votes || 0;
                 if(data.photoBase64) document.getElementById('carrosse-media').src = data.photoBase64;
             }
         });
 
-        // Fonction pour vérifier le profil avant de poster
         window.checkProfileBeforePost = function() {
             if (!currentUser) {
-                alert("Identifie-toi d'abord !");
-                window.goToPage(1, 0); // Envoie au NORD
+                window.goToPage(1, 0); // Direction NORD
             } else {
                 document.getElementById('file-input').click();
             }
         };
 
-        // Enregistrer le profil
         window.saveProfile = function() {
             const name = document.getElementById('username-input').value;
             if (name.length > 2) {
                 localStorage.setItem('up-t-username', name);
                 currentUser = name;
-                alert("Bienvenue " + name + " !");
-                window.goToPage(1, 1); // Retour au CENTRE
+                window.goToPage(1, 1); // Retour CENTRE
+            } else {
+                alert("Nom trop court !");
             }
         };
 
@@ -173,34 +195,34 @@
             };
             if(file) reader.readAsDataURL(file);
         });
+
+        // Fonction globale de navigation
+        window.goToPage = function(x, y) {
+            window.posX = x; window.posY = y;
+            document.getElementById('main-viewport').style.transform = `translate(${-x * 100}vw, ${-y * 100}vh)`;
+            document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+            const active = document.getElementById(`dot-${x}-${y}`);
+            if(active) active.classList.add('active');
+        };
     </script>
 
     <script>
-        let posX = 1; let posY = 1; let startX = 0; let startY = 0;
-        
-        window.goToPage = function(x, y) {
-            posX = x; posY = y; refresh();
-        };
-
-        function refresh() {
-            document.getElementById('main-viewport').style.transform = `translate(${-posX * 100}vw, ${-posY * 100}vh)`;
-            document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
-            const active = document.getElementById(`dot-${posX}-${posY}`);
-            if(active) active.classList.add('active');
-        }
+        // Logique de Swipe (récupère les variables globales du module)
+        window.posX = 1; window.posY = 1;
+        let startX = 0; let startY = 0;
 
         window.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; });
         window.addEventListener('touchend', e => {
             let dx = startX - e.changedTouches[0].clientX;
             let dy = startY - e.changedTouches[0].clientY;
             if(Math.abs(dx) > Math.abs(dy)) {
-                if(dx > 50 && posX < 2 && posY === 1) posX++;
-                if(dx < -50 && posX > 0 && posY === 1) posX--;
+                if(dx > 50 && window.posX < 2 && window.posY === 1) window.posX++;
+                if(dx < -50 && window.posX > 0 && window.posY === 1) window.posX--;
             } else {
-                if(dy > 50 && posY < 2 && posX === 1) posY++;
-                if(dy < -50 && posY > 0 && posX === 1) posY--;
+                if(dy > 50 && window.posY < 2 && window.posX === 1) window.posY++;
+                if(dy < -50 && window.posY > 0 && window.posX === 1) window.posY--;
             }
-            refresh();
+            window.goToPage(window.posX, window.posY);
         });
     </script>
 </body>
