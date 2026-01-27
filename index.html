@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | V4.8 Stable</title>
+    <title>Up-T | V4.9 Final GPS</title>
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #000000; }
 
@@ -14,7 +14,7 @@
             color: white; touch-action: none;
         }
 
-        /* BANDEAU GLASS */
+        /* BANDEAU GLASS 65PX */
         #control-band {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);
@@ -22,25 +22,33 @@
             z-index: 9999; display: flex; justify-content: center; align-items: center;
         }
 
-        #nav-gps { display: flex; gap: 8px; }
-        .dot { width: 12px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; }
-        .dot.active { background: white; box-shadow: 0 0 10px white; }
+        /* GPS EN CROIX */
+        #nav-gps {
+            display: grid; 
+            grid-template-columns: repeat(3, 12px); 
+            grid-template-rows: repeat(3, 3px); 
+            gap: 6px; 
+            align-items: center;
+        }
+        .dot { width: 12px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; transition: 0.3s; }
+        .dot.active { background: white; box-shadow: 0 0 8px white; }
+        .dot.hide { visibility: hidden; }
 
         /* BOUTONS ACTIONS */
         .round-btn-container { position: absolute; bottom: 12px; display: flex; flex-direction: column; align-items: center; }
-        .round-btn { width: 42px; height: 42px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; }
-        .round-btn svg { width: 20px; height: 20px; fill: black; }
-        .like-counter { background: white; color: black; font-size: 0.7rem; font-weight: 900; padding: 2px 6px; border-radius: 3px; margin-bottom: 3px; }
+        .round-btn { width: 44px; height: 44px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; }
+        .round-btn svg { width: 22px; height: 22px; fill: black; }
+        .like-counter { background: white; color: black; font-size: 0.75rem; font-weight: 900; padding: 2px 8px; border-radius: 3px; margin-bottom: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 
         .left-side { left: 20px; }
         .right-side { right: 20px; }
 
-        /* STRUCTURE NAVIGATION */
+        /* STRUCTURE NAVIGATION 3x3 */
         #main-viewport {
             display: flex; flex-direction: column;
             width: 300vw; height: 300vh;
             transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1);
-            transform: translate(-100vw, -100vh); /* Position de départ au centre */
+            transform: translate(-100vw, -100vh);
         }
         .row { display: flex; width: 300vw; height: 100vh; }
         .page { 
@@ -52,39 +60,39 @@
 
         /* FICHE PROFIL NORD */
         .profile-card {
-            background: rgba(30, 30, 30, 0.9);
-            padding: 30px; border-radius: 20px;
-            border: 1px solid var(--neon-blue);
+            background: rgba(20, 20, 20, 0.95);
+            padding: 35px 25px; border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
             width: 80%; max-width: 320px; text-align: center;
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
         }
-        .profile-card h2 { color: var(--neon-blue); margin-top: 0; font-size: 1.1rem; }
+        .profile-card h2 { letter-spacing: 3px; font-size: 1rem; margin-bottom: 5px; color: var(--neon-blue); }
+        .profile-card p { font-size: 0.75rem; opacity: 0.6; margin-bottom: 25px; }
         .profile-card input {
-            width: 90%; padding: 12px; margin: 15px 0;
-            background: #000; border: 1px solid #333;
-            color: white; border-radius: 8px; text-align: center;
+            width: 90%; padding: 14px; margin-bottom: 20px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: white; border-radius: 12px; text-align: center; font-size: 1.1rem;
         }
         .btn-validate {
             background: white; color: black; border: none;
-            padding: 12px 25px; border-radius: 8px; font-weight: bold; width: 100%;
+            padding: 16px; border-radius: 12px; font-weight: 900; width: 100%;
+            text-transform: uppercase; cursor: pointer;
         }
 
         /* CARROSSE */
         .story-container { width: 100vw; height: 100vh; background: #000; }
         #carrosse-media { width: 100%; height: 100%; object-fit: cover; }
 
-        h1 { font-size: 0.8rem; opacity: 0.2; letter-spacing: 5px; }
+        h1 { font-size: 0.8rem; opacity: 0.2; letter-spacing: 6px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <div id="control-band">
         <div id="nav-gps">
-            <div id="dot-1-0" class="dot"></div>
-            <div id="dot-0-1" class="dot"></div>
-            <div id="dot-1-1" class="dot active"></div>
-            <div id="dot-2-1" class="dot"></div>
-            <div id="dot-1-2" class="dot"></div>
+            <div class="dot hide"></div> <div id="dot-1-0" class="dot"></div> <div class="dot hide"></div>
+            <div id="dot-0-1" class="dot"></div> <div id="dot-1-1" class="dot active"></div> <div id="dot-2-1" class="dot"></div>
+            <div class="dot hide"></div> <div id="dot-1-2" class="dot"></div> <div class="dot hide"></div>
         </div>
 
         <div class="round-btn-container left-side">
@@ -104,16 +112,16 @@
 
     <div id="main-viewport">
         <div class="row">
-            <div class="page hide"></div>
+            <div class="page"></div>
             <div class="page">
                 <div class="profile-card">
-                    <h2>PILOTE INCONNU</h2>
-                    <p>Enregistre ton nom pour poster sur le Carrosse.</p>
-                    <input type="text" id="username-input" placeholder="TON NOM">
-                    <button class="btn-validate" onclick="saveProfile()">ACTIVER</button>
+                    <h2>ACCÈS PILOTE</h2>
+                    <p>Identifie-toi pour poster sur le Carrosse.</p>
+                    <input type="text" id="username-input" placeholder="TON PSEUDO">
+                    <button class="btn-validate" onclick="saveProfile()">VALIDER</button>
                 </div>
             </div>
-            <div class="page hide"></div>
+            <div class="page"></div>
         </div>
 
         <div class="row">
@@ -127,9 +135,9 @@
         </div>
 
         <div class="row">
-            <div class="page hide"></div>
+            <div class="page"></div>
             <div class="page"><h1>SHOP</h1></div>
-            <div class="page hide"></div>
+            <div class="page"></div>
         </div>
     </div>
 
@@ -168,22 +176,20 @@
             }
         });
 
-        // GESTION DU CLIC POSTER
         window.handlePostClick = function() {
             if (!currentUser) {
-                window.updatePos(1, 0); // Va au Nord
+                window.updatePos(1, 0); // Nord
             } else {
                 document.getElementById('file-input').click();
             }
         };
 
-        // SAUVEGARDE PROFIL
         window.saveProfile = function() {
             const val = document.getElementById('username-input').value;
             if(val.length > 2) {
                 localStorage.setItem('up-t-username', val);
                 currentUser = val;
-                window.updatePos(1, 1); // Revient au centre
+                window.updatePos(1, 1); // Centre
                 setTimeout(() => { document.getElementById('file-input').click(); }, 600);
             }
         };
@@ -200,32 +206,33 @@
             };
             if(file) reader.readAsDataURL(file);
         });
-    </script>
 
-    <script>
-        let curX = 1; let curY = 1;
-        let sX = 0; let sY = 0;
-
+        // Fonction globale de mise à jour de position
         window.updatePos = function(x, y) {
-            curX = x; curY = y;
+            window.curX = x; window.curY = y;
             document.getElementById('main-viewport').style.transform = `translate(${-x * 100}vw, ${-y * 100}vh)`;
             document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
             const d = document.getElementById(`dot-${x}-${y}`);
             if(d) d.classList.add('active');
         };
+    </script>
+
+    <script>
+        window.curX = 1; window.curY = 1;
+        let sX = 0; let sY = 0;
 
         window.addEventListener('touchstart', e => { sX = e.touches[0].clientX; sY = e.touches[0].clientY; });
         window.addEventListener('touchend', e => {
             let dx = sX - e.changedTouches[0].clientX;
             let dy = sY - e.changedTouches[0].clientY;
             if(Math.abs(dx) > Math.abs(dy)) {
-                if(dx > 50 && curX < 2 && curY === 1) curX++;
-                if(dx < -50 && curX > 0 && curY === 1) curX--;
+                if(dx > 50 && window.curX < 2 && window.curY === 1) window.curX++;
+                if(dx < -50 && window.curX > 0 && window.curY === 1) window.curX--;
             } else {
-                if(dy > 50 && curY < 2 && curX === 1) curY++;
-                if(dy < -50 && curY > 0 && curX === 1) curY--;
+                if(dy > 50 && window.curY < 2 && window.curX === 1) window.curY++;
+                if(dy < -50 && window.curY > 0 && window.curX === 1) window.curY--;
             }
-            window.updatePos(curX, curY);
+            window.updatePos(window.curX, window.curY);
         });
     </script>
 </body>
