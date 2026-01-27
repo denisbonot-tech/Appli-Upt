@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | Minimalist V4.2</title>
+    <title>Up-T | Cockpit V4.3</title>
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #050505; }
 
@@ -14,13 +14,14 @@
             color: white; touch-action: none;
         }
 
-        /* GPS EN BAS À DROITE (TRAITS MINIMALISTES) */
+        /* GPS CENTRÉ EN BAS */
         #nav-gps {
-            position: fixed; bottom: 25px; right: 25px;
-            display: grid; grid-template-columns: repeat(3, 15px); gap: 8px;
+            position: fixed; bottom: 25px; left: 50%;
+            transform: translateX(-50%);
+            display: grid; grid-template-columns: repeat(3, 15px); gap: 10px;
             z-index: 1000; padding: 10px;
         }
-        .dot { width: 15px; height: 2px; background: rgba(255,255,255,0.1); transition: 0.4s; }
+        .dot { width: 15px; height: 2px; background: rgba(255,255,255,0.15); transition: 0.4s; }
         .dot.active { background: white; box-shadow: 0 0 10px white; }
         .dot.hide { visibility: hidden; }
 
@@ -34,35 +35,29 @@
         .middle-row { display: flex; width: 300vw; height: 100vh; }
         .page { width: 100vw; height: 100vh; flex-shrink: 0; display: flex; justify-content: center; align-items: center; position: relative; }
 
-        /* CARROSSE DESIGN ÉPURÉ */
-        .story-container {
-            width: 100vw; height: 100vh; /* Plein écran pour l'immersion */
-            background: #000; position: relative;
-            overflow: hidden;
-        }
-
+        /* DESIGN CARROSSE PLEIN ÉCRAN */
+        .story-container { width: 100vw; height: 100vh; background: #000; position: relative; overflow: hidden; }
         #carrosse-media { width: 100%; height: 100%; object-fit: cover; }
 
-        /* BOUTON VOTE RECTANGLE BLANC */
-        .vote-box {
-            position: absolute; bottom: 100px; right: 20px;
+        /* BOUTONS ACTIONS (RECTANGLES BLANCS) */
+        .action-box {
+            position: absolute; bottom: 70px;
             background: white; color: black;
-            padding: 12px 20px; border-radius: 4px;
+            padding: 8px 15px; border-radius: 2px;
             display: flex; flex-direction: column; align-items: center;
-            font-weight: 900; font-size: 1.2rem;
+            font-weight: 800; font-size: 0.9rem;
             cursor: pointer; pointer-events: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            min-width: 60px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-transform: uppercase;
         }
-        .vote-box span { font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 2px; opacity: 0.6; }
+        .action-box span { font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 2px; opacity: 0.6; font-weight: 600; }
 
-        .btn-upload {
-            position: absolute; top: 40px; right: 20px;
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px 15px; color: white; border-radius: 4px;
-            font-size: 0.6rem; letter-spacing: 2px; backdrop-filter: blur(10px);
-        }
+        /* POSITIONNEMENT GAUCHE/DROITE */
+        .left-btn { left: 20px; }
+        .right-btn { right: 20px; }
 
-        h1 { font-size: 1rem; letter-spacing: 8px; opacity: 0.3; text-transform: uppercase; }
+        h1 { font-size: 0.9rem; letter-spacing: 6px; opacity: 0.3; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -83,11 +78,14 @@
                 <div class="story-container">
                     <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800" id="carrosse-media">
                     
-                    <button class="btn-upload" onclick="document.getElementById('file-input').click()">POSTER</button>
+                    <div class="action-box left-btn" onclick="document.getElementById('file-input').click()">
+                        <span>ACTION</span>
+                        <div>POSTER</div>
+                    </div>
                     <input type="file" id="file-input" accept="image/*" style="display:none">
 
-                    <div class="vote-box" onclick="castVote()">
-                        <span>SCORE</span>
+                    <div class="action-box right-btn" onclick="castVote()">
+                        <span>LIKES</span>
                         <div id="vote-count">0</div>
                     </div>
                 </div>
@@ -95,7 +93,7 @@
 
             <div class="page right">
                 <h1>Classement</h1>
-                <div id="rank-score" style="font-size: 5rem; font-weight: 900;">0</div>
+                <div id="rank-score" style="font-size: 4rem; font-weight: 900;">0</div>
             </div>
         </div>
 
