@@ -175,21 +175,18 @@
 
         // APP LOGIC
         window.saveProfile = () => { const n = document.getElementById('username-input').value; if(n) { localStorage.getItem('up-t-user', n); localStorage.setItem('up-t-user', n); user = n; goTo(2); } };
-        window.handlePost = () => { 
-    // On force la vérification en temps réel
-    const stored = localStorage.getItem('up-t-user');
+        window.handlePost = () => {
+    alert("TEST : Je vérifie le stockage...");
+    const testUser = localStorage.getItem('up-t-user');
+    alert("Valeur trouvée : " + testUser);
     
-    // TRIPLE CHECK : Pas de nul, pas de vide, pas de texte "null"
-    if (!stored || stored === "" || stored === "null" || stored === undefined) { 
-        console.error("ALERTE : Pilote non identifié !");
-        alert("🔒 ACCÈS REFUSÉ : Enregistre ton nom de pilote sur la page Profil !"); 
-        window.goTo(1); 
-        return; 
-    } 
-
-    // Si on arrive ici, le nom est valide
-    user = stored;
-    document.getElementById('file-input').click(); 
+    if (!testUser) {
+        alert("Action : Blocage et redirection !");
+        window.goTo(1);
+    } else {
+        alert("Action : Ouverture galerie !");
+        document.getElementById('file-input').click();
+    }
 };
         window.castVote = async () => { await updateDoc(docRef, { votes: increment(1) }); };
         window.createRoom = async () => {
