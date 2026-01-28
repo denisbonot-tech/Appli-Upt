@@ -176,19 +176,19 @@
         // APP LOGIC
         window.saveProfile = () => { const n = document.getElementById('username-input').value; if(n) { localStorage.getItem('up-t-user', n); localStorage.setItem('up-t-user', n); user = n; goTo(2); } };
         window.handlePost = () => { 
-    // 1. On va chercher l'info à la source
-    const storedUser = localStorage.getItem('up-t-user');
+    // On force la vérification en temps réel
+    const stored = localStorage.getItem('up-t-user');
     
-    // 2. Si le stockage est vide OU si la variable est vide
-    if (!storedUser || storedUser === "" || storedUser === "null") { 
+    // TRIPLE CHECK : Pas de nul, pas de vide, pas de texte "null"
+    if (!stored || stored === "" || stored === "null" || stored === undefined) { 
+        console.error("ALERTE : Pilote non identifié !");
         alert("🔒 ACCÈS REFUSÉ : Enregistre ton nom de pilote sur la page Profil !"); 
-        window.goTo(1); // On te renvoie au profil
-        return; // ON ARRÊTE TOUT ICI
+        window.goTo(1); 
+        return; 
     } 
 
-    // 3. Si on est là, c'est que l'utilisateur est valide
-    user = storedUser; 
-    console.log("Pilote identifié : " + user);
+    // Si on arrive ici, le nom est valide
+    user = stored;
     document.getElementById('file-input').click(); 
 };
         window.castVote = async () => { await updateDoc(docRef, { votes: increment(1) }); };
