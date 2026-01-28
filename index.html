@@ -1,191 +1,114 @@
-Écoute bien, Major, tu as l'œil d'un faucon. Quand on construit un moteur haute performance, on ne peut pas se permettre d'oublier les bougies d'allumage.
-
-Dans la version précédente, j'avais mis des "..." pour gagner du temps de lecture, mais tu as raison : pour que ça décolle, il te faut le fuselage complet, câblage inclus.
-
-Voici la V6.2 Intégrale. C'est le code complet, sans aucune coupure. Il contient :
-
-    La structure 5 pages (Missions, Profil, Carrosse, Classement, Mur).
-
-    Le Correctif Visuel : Les icônes du Carrosse sont forcées en noir sur blanc.
-
-    Le Système de Salons : Création, titre, auteur et timer.
-
-    Le Bloc Firebase Prêt à l'Emploi : Tu n'as qu'à coller tes clés une seule fois.
-
-🚀 Code Maître V6.2 (Full App & API Ready)
-HTML
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | V6.2 Full Engine</title>
+    <title>Up-T | V6.3 Final Fix</title>
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #000000; --glass: rgba(255, 255, 255, 0.1); }
-        
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background-color: var(--bg-dark); 
-            font-family: 'Inter', -apple-system, sans-serif; color: white; touch-action: none; 
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: var(--bg-dark); font-family: 'Inter', sans-serif; color: white; touch-action: none; }
 
-        /* GPS SATELLITE */
-        #gps-container {
-            position: fixed; bottom: 55px; left: 50%;
-            transform: translateX(-50%);
-            display: flex; gap: 12px; z-index: 1001;
-        }
+        /* GPS & TASKBAR */
+        #gps-container { position: fixed; bottom: 55px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 1001; }
         .dot { width: 5px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 50%; transition: 0.4s; }
         .dot.active { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); transform: scale(1.3); }
-
-        /* BARRE DE TÂCHES 45PX */
-        #taskbar {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 45px;
-            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 1000;
-        }
-        .nav-item { display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0.3; transition: 0.3s; width: 20%; height: 100%; }
+        #taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 45px; background: var(--glass); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .nav-item { opacity: 0.3; transition: 0.3s; display: flex; align-items: center; justify-content: center; width: 20%; height: 100%; cursor: pointer; }
         .nav-item.active { opacity: 1; color: var(--neon-blue); }
         .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
 
-        /* VIEWPORT HORIZONTAL */
-        #main-viewport {
-            display: flex; width: 500vw; height: 100vh;
-            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-            transform: translateX(-200vw); /* Départ Carrosse */
-        }
-        .page { 
-            width: 100vw; height: 100vh; flex-shrink: 0;
-            display: flex; flex-direction: column; position: relative;
-        }
+        /* VIEWPORT */
+        #main-viewport { display: flex; width: 500vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1); transform: translateX(-200vw); }
+        .page { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* CARROSSE (PAGE 2) */
-        .story-container { width: 100%; height: 100%; background: #000; position: relative; }
+        /* CARROSSE */
+        .story-container { width: 100%; height: 100%; background: #000; }
         #carrosse-media { width: 100%; height: 100%; object-fit: cover; }
-        .fab-container { 
-            position: absolute; bottom: 110px; width: 100%; 
-            display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; 
-        }
-        .fab { 
-            width: 56px; height: 56px; background: white; border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: none; cursor: pointer;
-        }
-        /* FIX ICONES NOIRES */
-        .fab svg { width: 28px; height: 28px; fill: #000000 !important; }
-        .vote-badge { 
-            position: absolute; top: -25px; background: white; color: black; 
-            padding: 2px 8px; border-radius: 4px; font-weight: 900; font-size: 0.7rem; 
-        }
+        .fab-container { position: absolute; bottom: 110px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; }
+        .fab { width: 56px; height: 56px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: none; }
+        .fab svg { width: 28px; height: 28px; fill: black !important; }
 
-        /* LE MUR (PAGE 4) */
-        #room-list { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 120px; padding-top: 80px; }
-        .room-card { 
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; 
-            border: 1px solid rgba(255,255,255,0.1); border-left: 4px solid var(--neon-blue);
-        }
-        .room-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .room-title { font-weight: 800; color: var(--neon-blue); text-transform: uppercase; font-size: 0.9rem; }
-        .room-timer { font-size: 0.7rem; color: #ff4444; font-weight: 700; }
-        .room-info { font-size: 0.65rem; opacity: 0.5; }
-        
-        #create-room-btn { 
-            position: absolute; top: 20px; right: 20px; 
-            background: var(--neon-blue); color: black; border: none; 
-            padding: 10px 18px; border-radius: 20px; font-weight: 900; font-size: 0.7rem; z-index: 10; 
-        }
+        /* MUR & SALONS */
+        #room-list { flex: 1; overflow-y: auto; padding: 20px; padding-top: 80px; padding-bottom: 60px; display: flex; flex-direction: column; gap: 12px; }
+        .room-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 4px solid var(--neon-blue); cursor: pointer; }
+        .room-title { font-weight: 800; color: var(--neon-blue); display: block; }
+        #create-room-btn { position: absolute; top: 20px; right: 20px; background: var(--neon-blue); color: black; border: none; padding: 10px 15px; border-radius: 20px; font-weight: 900; z-index: 10; }
 
-        /* MODAL */
-        #room-modal { 
-            display: none; position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.95); z-index: 2000; 
-            flex-direction: column; justify-content: center; align-items: center; padding: 30px; 
-        }
-        #room-modal h3 { color: var(--neon-blue); letter-spacing: 2px; }
-        #room-modal input { 
-            width: 100%; padding: 15px; background: #111; border: 1px solid #333; 
-            color: white; margin-bottom: 15px; border-radius: 10px; text-align: center;
-        }
+        /* CHAT INTERNE (OVERLAY) */
+        #chat-overlay { display: none; position: absolute; inset: 0; background: black; z-index: 1005; flex-direction: column; }
+        #messages-display { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #222; }
+        .msg-u { color: var(--neon-blue); font-size: 0.7rem; font-weight: 800; }
+        #chat-bar { padding: 10px; display: flex; gap: 10px; background: #080808; border-top: 1px solid #222; margin-bottom: 50px; }
+        #chat-bar input { flex: 1; background: #111; border: 1px solid #333; color: white; padding: 10px; border-radius: 20px; }
 
-        /* PROFIL */
-        .profile-card { margin: auto; width: 80%; max-width: 320px; text-align: center; }
-        .profile-card input { 
-            width: 100%; padding: 15px; background: #111; border: 1px solid #333; 
-            color: white; border-radius: 10px; text-align: center; margin-bottom: 15px;
-        }
-
-        h1 { font-size: 0.8rem; letter-spacing: 5px; text-align: center; margin-top: 25px; opacity: 0.3; text-transform: uppercase; }
+        /* MODAL & PROFIL */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
+        .modal input { width: 100%; padding: 15px; background: #111; border: 1px solid #333; color: white; margin-bottom: 10px; border-radius: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="gps-container">
-        <div class="dot" id="dot-0"></div><div class="dot" id="dot-1"></div>
-        <div class="dot active" id="dot-2"></div><div class="dot" id="dot-3"></div>
-        <div class="dot" id="dot-4"></div>
-    </div>
+    <div id="gps-container"><div class="dot" id="dot-0"></div><div class="dot" id="dot-1"></div><div class="dot active" id="dot-2"></div><div class="dot" id="dot-3"></div><div class="dot" id="dot-4"></div></div>
 
     <nav id="taskbar">
-        <div class="nav-item" id="nav-0" onclick="goTo(0)"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
-        <div class="nav-item" id="nav-1" onclick="goTo(1)"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-        <div class="nav-item active" id="nav-2" onclick="goTo(2)"><svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg></div>
-        <div class="nav-item" id="nav-3" onclick="goTo(3)"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 10.63 21 8.55 21 8V7c0-1.1-.9-2-2-2z"/></svg></div>
-        <div class="nav-item" id="nav-4" onclick="goTo(4)"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
+        <div class="nav-item" onclick="goTo(0)"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
+        <div class="nav-item" onclick="goTo(1)"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+        <div class="nav-item active" onclick="goTo(2)"><svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg></div>
+        <div class="nav-item" onclick="goTo(3)"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 10.63 21 8.55 21 8V7c0-1.1-.9-2-2-2z"/></svg></div>
+        <div class="nav-item" onclick="goTo(4)"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
     </nav>
 
     <div id="main-viewport">
         <div class="page"><h1>Missions</h1></div>
-
         <div class="page">
-            <div class="profile-card">
-                <h1>IDENTITÉ</h1>
-                <input type="text" id="username-input" placeholder="TON NOM DE PILOTE">
-                <button onclick="saveProfile()" style="width:100%; padding:15px; background:white; color:black; border:none; border-radius:10px; font-weight:900;">ACTIVER</button>
+            <div style="margin: auto; width: 80%; text-align: center;">
+                <h2>PROFIL</h2>
+                <input type="text" id="username-input" placeholder="TON NOM">
+                <button onclick="saveProfile()" style="width:100%; padding:15px; background:white; color:black; border-radius:10px; font-weight:900;">ACTIVER</button>
             </div>
         </div>
-
         <div class="page">
             <div class="story-container">
                 <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800" id="carrosse-media">
                 <div class="fab-container">
-                    <button class="fab" onclick="handlePost()">
-                        <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                    </button>
-                    <button class="fab" onclick="castVote()">
-                        <div id="vote-count" class="vote-badge">0</div>
-                        <svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
-                    </button>
+                    <button class="fab" onclick="handlePost()"><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></button>
+                    <button class="fab" onclick="castVote()"><div id="vote-count" class="vote-badge">0</div><svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg></button>
                 </div>
             </div>
             <input type="file" id="file-input" style="display:none">
         </div>
-
         <div class="page"><h1>Classement</h1></div>
-
         <div class="page">
             <button id="create-room-btn" onclick="openModal()">+ NOUVEAU SALON</button>
             <div id="room-list"></div>
+            <div id="chat-overlay">
+                <div style="padding:15px; background:#111; display:flex; justify-content:space-between;">
+                    <span id="active-room-title" style="color:var(--neon-blue); font-weight:900;">SALON</span>
+                    <button onclick="closeChat()" style="background:none; border:none; color:white;">FERMER</button>
+                </div>
+                <div id="messages-display"></div>
+                <div id="chat-bar">
+                    <input type="text" id="chat-input" placeholder="Ton message...">
+                    <button onclick="sendMsg()" style="background:var(--neon-blue); border:none; padding:10px; border-radius:10px;">ENVOYER</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="room-modal">
+    <div id="room-modal" class="modal">
         <h3>LANCER UN CHAT</h3>
-        <input type="text" id="room-title-in" placeholder="Titre du salon...">
-        <input type="number" id="room-timer-in" placeholder="Délai (minutes)...">
-        <button onclick="createRoom()" style="width:100%; padding:15px; background:var(--neon-blue); border:none; border-radius:10px; font-weight:900; color:black;">OUVRIR LE SALON</button>
-        <button onclick="closeModal()" style="margin-top:20px; background:none; border:none; color:white; opacity:0.5;">RETOUR</button>
+        <input type="text" id="room-title-in" placeholder="Titre...">
+        <input type="number" id="room-timer-in" placeholder="Minutes...">
+        <button onclick="createRoom()" style="width:100%; padding:15px; background:var(--neon-blue); border:none; border-radius:10px; font-weight:900;">CRÉER</button>
+        <button onclick="closeModal()" style="margin-top:10px; color:white; background:none; border:none;">ANNULER</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, updateDoc, increment, onSnapshot, collection, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, updateDoc, increment, onSnapshot, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIG FIREBASE - COLLE TES INFOS ICI
-        const firebaseConfig = {
-            apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk",
+        const firebaseConfig = { apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk",
 
   authDomain: "up-t-network.firebaseapp.com",
 
@@ -198,94 +121,67 @@ HTML
   appId: "1:1066469813456:web:4b660350832ea1d95702d5",
 
   measurementId: "G-7CSRYYCZWV"
-
-        };
-
+};
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const docRef = doc(db, "challenges", "week_01");
         const roomsCol = collection(db, "rooms");
-
         let user = localStorage.getItem('up-t-user');
+        let currentRoomId = null;
 
-        // Realtime Data (Carrosse)
-        onSnapshot(docRef, (snap) => {
-            if (snap.exists()) {
-                const d = snap.data();
-                document.getElementById('vote-count').innerText = d.votes || 0;
-                if(d.photoBase64) document.getElementById('carrosse-media').src = d.photoBase64;
-            }
-        });
+        onSnapshot(docRef, (snap) => { if (snap.exists()) { const d = snap.data(); document.getElementById('vote-count').innerText = d.votes || 0; if(d.photoBase64) document.getElementById('carrosse-media').src = d.photoBase64; }});
 
-        // Realtime Salons (Le Mur)
         onSnapshot(query(roomsCol, orderBy("createdAt", "desc")), (snap) => {
-            const list = document.getElementById('room-list');
-            list.innerHTML = "";
+            const list = document.getElementById('room-list'); list.innerHTML = "";
             snap.forEach(doc => {
                 const r = doc.data();
-                const timeStr = new Date(r.createdAt).toLocaleTimeString([], {hour: '2h', minute:'2h'});
-                list.innerHTML += `
-                    <div class="room-card">
-                        <div class="room-header">
-                            <span class="room-title">${r.title}</span>
-                            <span class="room-timer">⏳ ${r.timer} MIN</span>
-                        </div>
-                        <div class="room-info">Par ${r.author} • Créé à ${timeStr}</div>
-                    </div>`;
+                const div = document.createElement('div'); div.className = 'room-card';
+                div.innerHTML = `<span class="room-title">${r.title}</span><small>Par ${r.author} • ${r.timer}min</small>`;
+                div.onclick = () => openChat(doc.id, r.title);
+                list.appendChild(div);
             });
         });
 
-        // Actions
-        window.saveProfile = function() {
-            const n = document.getElementById('username-input').value;
-            if(n.length > 2) { localStorage.setItem('up-t-user', n); user = n; window.goTo(2); }
+        window.openChat = (id, title) => {
+            currentRoomId = id; document.getElementById('active-room-title').innerText = title;
+            document.getElementById('chat-overlay').style.display = 'flex';
+            const q = query(collection(db, `rooms/${id}/messages`), orderBy("time", "asc"), limit(50));
+            onSnapshot(q, (snap) => {
+                const box = document.getElementById('messages-display'); box.innerHTML = "";
+                snap.forEach(m => { const d = m.data(); box.innerHTML += `<div class="msg"><div class="msg-u">${d.user}</div><div>${d.text}</div></div>`; });
+                box.scrollTop = box.scrollHeight;
+            });
         };
 
-        window.handlePost = function() {
-            if(!user) { window.goTo(1); } else { document.getElementById('file-input').click(); }
-        };
-
-        window.castVote = async function() {
-            try { await updateDoc(docRef, { votes: increment(1) }); } catch(e) {}
-        };
-
-        window.createRoom = async function() {
-            const t = document.getElementById('room-title-in').value;
-            const d = document.getElementById('room-timer-in').value;
-            if(!user) { alert("Nomme-toi d'abord !"); window.goTo(1); window.closeModal(); return; }
-            if(t && d) {
-                await addDoc(roomsCol, { title: t, timer: d, author: user, createdAt: Date.now() });
-                window.closeModal();
+        window.sendMsg = async () => {
+            const inp = document.getElementById('chat-input');
+            if(inp.value.trim() && currentRoomId) {
+                await addDoc(collection(db, `rooms/${currentRoomId}/messages`), { user, text: inp.value, time: Date.now() });
+                inp.value = "";
             }
+        };
+
+        window.handlePost = () => { if(!user) { alert("Inscris-toi d'abord !"); window.goTo(1); } else { document.getElementById('file-input').click(); } };
+        window.saveProfile = () => { const n = document.getElementById('username-input').value; if(n) { localStorage.setItem('up-t-user', n); user = n; window.goTo(2); } };
+        window.createRoom = async () => {
+            const t = document.getElementById('room-title-in').value; const d = document.getElementById('room-timer-in').value;
+            if(t && d && user) { await addDoc(roomsCol, { title: t, timer: d, author: user, createdAt: Date.now() }); closeModal(); }
         };
 
         document.getElementById('file-input').addEventListener('change', (e) => {
-            const f = e.target.files[0];
-            const reader = new FileReader();
-            reader.onloadend = async () => { await updateDoc(docRef, { photoBase64: reader.result, author: user }); };
-            if(f) reader.readAsDataURL(f);
+            const f = e.target.files[0]; const r = new FileReader();
+            r.onloadend = async () => { await updateDoc(docRef, { photoBase64: r.result, author: user }); };
+            if(f) r.readAsDataURL(f);
         });
 
+        window.goTo = (i) => { 
+            document.getElementById('main-viewport').style.transform = `translateX(${-i*100}vw)`;
+            document.querySelectorAll('.dot').forEach((d,idx) => d.classList.toggle('active', idx===i));
+            document.querySelectorAll('.nav-item').forEach((n,idx) => n.classList.toggle('active', idx===i));
+        };
+        window.closeChat = () => document.getElementById('chat-overlay').style.display = 'none';
         window.openModal = () => document.getElementById('room-modal').style.display = 'flex';
         window.closeModal = () => document.getElementById('room-modal').style.display = 'none';
-
-        // Nav Logic
-        let cur = 2; let sX = 0;
-        window.goTo = function(idx) {
-            cur = idx;
-            document.getElementById('main-viewport').style.transform = `translateX(${-idx * 100}vw)`;
-            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
-            document.querySelectorAll('.nav-item').forEach((n, i) => n.classList.toggle('active', i === idx));
-        };
-
-        window.addEventListener('touchstart', e => { sX = e.touches[0].clientX; });
-        window.addEventListener('touchend', e => {
-            let dx = sX - e.changedTouches[0].clientX;
-            if(Math.abs(dx) > 50) {
-                if(dx > 0 && cur < 4) window.goTo(cur + 1);
-                if(dx < 0 && cur > 0) window.goTo(cur - 1);
-            }
-        });
     </script>
 </body>
 </html>
