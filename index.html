@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Up-T | V4.9 Final GPS</title>
+    <link rel="manifest" href="data:application/manifest+json,{
+  \"name\": \"Up-T Carrosse\",
+  \"short_name\": \"Carrosse\",
+  \"start_url\": \".\",
+  \"display\": \"standalone\",
+  \"background_color\": \"#000000\",
+  \"theme_color\": \"#00f3ff\",
+  \"icons\": [{
+    \"src\": \"https://via.placeholder.com/192/000000/00f3ff?text=UpT\",
+    \"sizes\": \"192x192\",
+    \"type\": \"image/png\"
+  }]
+}">
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #000000; }
 
@@ -184,28 +197,43 @@
             }
         };
 
-        window.saveProfile = function() {
-            const val = document.getElementById('username-input').value;
-            if(val.length > 2) {
-                localStorage.setItem('up-t-username', val);
-                currentUser = val;
-                window.updatePos(1, 1); // Centre
-                setTimeout(() => { document.getElementById('file-input').click(); }, 600);
-            }
-        };
+        let currentUser = null;
+const saved = localStorage.getItem('up-t-user');
+if (saved) {
+    currentUser = JSON.parse(saved);
+}
 
-        window.castVote = async function() {
-            try { await updateDoc(docRef, { votes: increment(1) }); } catch(e) {}
-        };
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-        document.getElementById('file-input').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                await updateDoc(docRef, { photoBase64: reader.result, author: currentUser });
-            };
-            if(file) reader.readAsDataURL(file);
-        });
+    const btn = document.querySelector('.left-side .round-btn');
+    const original = btn.innerHTML;
+    btn.style.opacity = '0.6';
+    btn.innerHTML = '⏳';
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+        try {
+            await updateDoc(docRef, {
+                photoBase64: reader.result,
+                author: currentUser,
+                lastPosted: new Date().toISOString()
+            });
+            voteSound.currentTime = 0;
+voteSound.play().catch(() => {});
+            console.log("Photo postée !");
+        } catch (err) {
+            console.error("Erreur upload :", err);
+        } finally {
+            setTimeout(() => {
+                btn.style.opacity = '1';
+                btn.innerHTML = original;
+            }, 1000);
+        }
+    };
+    reader.readAsDataURL(file);
+});
 
         // Fonction globale de mise à jour de position
         window.updatePos = function(x, y) {
@@ -234,6 +262,8 @@
             }
             window.updatePos(window.curX, window.curY);
         });
+        const voteSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3');
+voteSound.volume = 0.4;
     </script>
 </body>
 </html>
