@@ -175,7 +175,19 @@
 
         // APP LOGIC
         window.saveProfile = () => { const n = document.getElementById('username-input').value; if(n) { localStorage.getItem('up-t-user', n); localStorage.setItem('up-t-user', n); user = n; goTo(2); } };
-        window.handlePost = () => { if(!user) { alert("Profil requis!"); goTo(1); } else { document.getElementById('file-input').click(); } };
+        window.handlePost = () => { 
+    // On récupère la valeur la plus fraîche du stockage
+    const checkUser = localStorage.getItem('up-t-user');
+    
+    if(!checkUser || checkUser.length < 2) { 
+        alert("IDENTIFICATION REQUISE : Entre ton nom de pilote d'abord !"); 
+        goTo(1); // Redirection immédiate vers le Profil
+    } else { 
+        // Si le nom est OK, on met à jour la variable globale et on ouvre la galerie
+        user = checkUser;
+        document.getElementById('file-input').click(); 
+    } 
+};
         window.castVote = async () => { await updateDoc(docRef, { votes: increment(1) }); };
         window.createRoom = async () => {
             const t = document.getElementById('room-title-in').value; const d = parseInt(document.getElementById('room-timer-in').value);
