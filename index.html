@@ -1,17 +1,33 @@
+Écoute bien, Major, tu as l'œil d'un faucon. Quand on construit un moteur haute performance, on ne peut pas se permettre d'oublier les bougies d'allumage.
+
+Dans la version précédente, j'avais mis des "..." pour gagner du temps de lecture, mais tu as raison : pour que ça décolle, il te faut le fuselage complet, câblage inclus.
+
+Voici la V6.2 Intégrale. C'est le code complet, sans aucune coupure. Il contient :
+
+    La structure 5 pages (Missions, Profil, Carrosse, Classement, Mur).
+
+    Le Correctif Visuel : Les icônes du Carrosse sont forcées en noir sur blanc.
+
+    Le Système de Salons : Création, titre, auteur et timer.
+
+    Le Bloc Firebase Prêt à l'Emploi : Tu n'as qu'à coller tes clés une seule fois.
+
+🚀 Code Maître V6.2 (Full App & API Ready)
+HTML
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | V6.0 Interactive Mur</title>
+    <title>Up-T | V6.2 Full Engine</title>
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #000000; --glass: rgba(255, 255, 255, 0.1); }
-
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background-color: var(--bg-dark);
-            font-family: 'Inter', -apple-system, sans-serif;
-            color: white; touch-action: none;
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; background-color: var(--bg-dark); 
+            font-family: 'Inter', -apple-system, sans-serif; color: white; touch-action: none; 
         }
 
         /* GPS SATELLITE */
@@ -28,42 +44,80 @@
             position: fixed; bottom: 0; left: 0; width: 100%; height: 45px;
             background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 1000;
         }
         .nav-item { display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0.3; transition: 0.3s; width: 20%; height: 100%; }
         .nav-item.active { opacity: 1; color: var(--neon-blue); }
-        .nav-item svg { width: 20px; height: 20px; fill: currentColor; }
+        .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
 
-        /* VIEWPORT */
-        #main-viewport { display: flex; width: 500vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1); transform: translateX(-200vw); }
-        .page { width: 100vw; height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-
-        /* LE MUR (CHAT) - PAGE 4 */
-        #chat-container { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 110px; display: flex; flex-direction: column; gap: 10px; background: #080808; }
-        .msg { background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 15px; max-width: 80%; border-left: 3px solid var(--neon-blue); }
-        .msg-user { font-size: 0.7rem; color: var(--neon-blue); font-weight: 800; margin-bottom: 4px; text-transform: uppercase; }
-        .msg-text { font-size: 0.9rem; line-height: 1.4; }
-
-        #chat-input-area { 
-            position: absolute; bottom: 55px; left: 0; width: 100%; 
-            padding: 10px; display: flex; gap: 10px; box-sizing: border-box; 
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+        /* VIEWPORT HORIZONTAL */
+        #main-viewport {
+            display: flex; width: 500vw; height: 100vh;
+            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            transform: translateX(-200vw); /* Départ Carrosse */
         }
-        #chat-input-area input { flex: 1; background: #111; border: 1px solid #333; color: white; padding: 10px; border-radius: 20px; outline: none; }
-        #chat-input-area button { background: var(--neon-blue); border: none; width: 40px; height: 40px; border-radius: 50%; color: black; font-weight: 900; }
+        .page { 
+            width: 100vw; height: 100vh; flex-shrink: 0;
+            display: flex; flex-direction: column; position: relative;
+        }
 
         /* CARROSSE (PAGE 2) */
-        .story-container { width: 100vw; height: 100vh; background: #000; position: relative; }
+        .story-container { width: 100%; height: 100%; background: #000; position: relative; }
         #carrosse-media { width: 100%; height: 100%; object-fit: cover; }
-        .fab-container { position: absolute; bottom: 120px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; }
-        .fab { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.6); pointer-events: auto; }
-        .vote-badge { position: absolute; top: -25px; background: white; color: black; padding: 2px 8px; border-radius: 4px; font-weight: 900; font-size: 0.7rem; }
+        .fab-container { 
+            position: absolute; bottom: 110px; width: 100%; 
+            display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; 
+        }
+        .fab { 
+            width: 56px; height: 56px; background: white; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: none; cursor: pointer;
+        }
+        /* FIX ICONES NOIRES */
+        .fab svg { width: 28px; height: 28px; fill: #000000 !important; }
+        .vote-badge { 
+            position: absolute; top: -25px; background: white; color: black; 
+            padding: 2px 8px; border-radius: 4px; font-weight: 900; font-size: 0.7rem; 
+        }
 
-        /* PROFIL (PAGE 1) */
-        .profile-card { background: var(--glass); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 80%; max-width: 320px; text-align: center; align-self: center; margin-top: auto; margin-bottom: auto; }
-        .profile-card input { width: 90%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; text-align: center; margin: 15px 0; }
+        /* LE MUR (PAGE 4) */
+        #room-list { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 120px; padding-top: 80px; }
+        .room-card { 
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.1); border-left: 4px solid var(--neon-blue);
+        }
+        .room-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .room-title { font-weight: 800; color: var(--neon-blue); text-transform: uppercase; font-size: 0.9rem; }
+        .room-timer { font-size: 0.7rem; color: #ff4444; font-weight: 700; }
+        .room-info { font-size: 0.65rem; opacity: 0.5; }
         
-        h1 { font-size: 1rem; letter-spacing: 8px; opacity: 0.2; text-align: center; width: 100%; margin-top: 50px; }
+        #create-room-btn { 
+            position: absolute; top: 20px; right: 20px; 
+            background: var(--neon-blue); color: black; border: none; 
+            padding: 10px 18px; border-radius: 20px; font-weight: 900; font-size: 0.7rem; z-index: 10; 
+        }
+
+        /* MODAL */
+        #room-modal { 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.95); z-index: 2000; 
+            flex-direction: column; justify-content: center; align-items: center; padding: 30px; 
+        }
+        #room-modal h3 { color: var(--neon-blue); letter-spacing: 2px; }
+        #room-modal input { 
+            width: 100%; padding: 15px; background: #111; border: 1px solid #333; 
+            color: white; margin-bottom: 15px; border-radius: 10px; text-align: center;
+        }
+
+        /* PROFIL */
+        .profile-card { margin: auto; width: 80%; max-width: 320px; text-align: center; }
+        .profile-card input { 
+            width: 100%; padding: 15px; background: #111; border: 1px solid #333; 
+            color: white; border-radius: 10px; text-align: center; margin-bottom: 15px;
+        }
+
+        h1 { font-size: 0.8rem; letter-spacing: 5px; text-align: center; margin-top: 25px; opacity: 0.3; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -84,42 +138,52 @@
 
     <div id="main-viewport">
         <div class="page"><h1>Missions</h1></div>
+
         <div class="page">
             <div class="profile-card">
-                <h2>PILOTE</h2>
-                <input type="text" id="username-input" placeholder="TON NOM">
-                <button style="width:100%; padding:14px; background:white; color:black; border:none; border-radius:10px; font-weight:900;" onclick="saveProfile()">ACTIVER</button>
+                <h1>IDENTITÉ</h1>
+                <input type="text" id="username-input" placeholder="TON NOM DE PILOTE">
+                <button onclick="saveProfile()" style="width:100%; padding:15px; background:white; color:black; border:none; border-radius:10px; font-weight:900;">ACTIVER</button>
             </div>
         </div>
+
         <div class="page">
             <div class="story-container">
                 <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800" id="carrosse-media">
                 <div class="fab-container">
-                    <div class="fab" onclick="handlePost()"><svg viewBox="0 0 24 24" style="fill:black"><path d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9z"/></svg></div>
-                    <div class="fab" onclick="castVote()">
+                    <button class="fab" onclick="handlePost()">
+                        <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                    </button>
+                    <button class="fab" onclick="castVote()">
                         <div id="vote-count" class="vote-badge">0</div>
-                        <svg viewBox="0 0 24 24" style="fill:black"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
-                    </div>
+                        <svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
+                    </button>
                 </div>
             </div>
             <input type="file" id="file-input" style="display:none">
         </div>
+
         <div class="page"><h1>Classement</h1></div>
-        
+
         <div class="page">
-            <h1>Le Mur</h1>
-            <div id="chat-container"></div>
-            <div id="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Écris un message...">
-                <button onclick="sendMsg()">></button>
-            </div>
+            <button id="create-room-btn" onclick="openModal()">+ NOUVEAU SALON</button>
+            <div id="room-list"></div>
         </div>
+    </div>
+
+    <div id="room-modal">
+        <h3>LANCER UN CHAT</h3>
+        <input type="text" id="room-title-in" placeholder="Titre du salon...">
+        <input type="number" id="room-timer-in" placeholder="Délai (minutes)...">
+        <button onclick="createRoom()" style="width:100%; padding:15px; background:var(--neon-blue); border:none; border-radius:10px; font-weight:900; color:black;">OUVRIR LE SALON</button>
+        <button onclick="closeModal()" style="margin-top:20px; background:none; border:none; color:white; opacity:0.5;">RETOUR</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, updateDoc, increment, onSnapshot, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, updateDoc, increment, onSnapshot, collection, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // CONFIG FIREBASE - COLLE TES INFOS ICI
         const firebaseConfig = {
             apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk",
 
@@ -140,11 +204,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const docRef = doc(db, "challenges", "week_01");
-        const msgCol = collection(db, "messages");
+        const roomsCol = collection(db, "rooms");
 
         let user = localStorage.getItem('up-t-user');
 
-        // Écoute des votes et de la photo
+        // Realtime Data (Carrosse)
         onSnapshot(docRef, (snap) => {
             if (snap.exists()) {
                 const d = snap.data();
@@ -153,51 +217,59 @@
             }
         });
 
-        // Écoute des messages du Mur (Derniers 50)
-        const q = query(msgCol, orderBy("time", "asc"), limit(50));
-        onSnapshot(q, (snap) => {
-            const chatBox = document.getElementById('chat-container');
-            chatBox.innerHTML = "";
+        // Realtime Salons (Le Mur)
+        onSnapshot(query(roomsCol, orderBy("createdAt", "desc")), (snap) => {
+            const list = document.getElementById('room-list');
+            list.innerHTML = "";
             snap.forEach(doc => {
-                const d = doc.data();
-                chatBox.innerHTML += `<div class="msg"><div class="msg-user">${d.user}</div><div class="msg-text">${d.text}</div></div>`;
+                const r = doc.data();
+                const timeStr = new Date(r.createdAt).toLocaleTimeString([], {hour: '2h', minute:'2h'});
+                list.innerHTML += `
+                    <div class="room-card">
+                        <div class="room-header">
+                            <span class="room-title">${r.title}</span>
+                            <span class="room-timer">⏳ ${r.timer} MIN</span>
+                        </div>
+                        <div class="room-info">Par ${r.author} • Créé à ${timeStr}</div>
+                    </div>`;
             });
-            chatBox.scrollTop = chatBox.scrollHeight;
         });
 
-        window.sendMsg = async function() {
-            const input = document.getElementById('chat-input');
-            if(!user) { alert("Nomme-toi sur ton profil !"); window.goTo(1); return; }
-            if(input.value.trim() !== "") {
-                await addDoc(msgCol, { user: user, text: input.value, time: Date.now() });
-                input.value = "";
-            }
-        };
-
-        window.castVote = async function() {
-            try { await updateDoc(docRef, { votes: increment(1) }); } catch(e) {}
+        // Actions
+        window.saveProfile = function() {
+            const n = document.getElementById('username-input').value;
+            if(n.length > 2) { localStorage.setItem('up-t-user', n); user = n; window.goTo(2); }
         };
 
         window.handlePost = function() {
             if(!user) { window.goTo(1); } else { document.getElementById('file-input').click(); }
         };
 
-        window.saveProfile = function() {
-            const name = document.getElementById('username-input').value;
-            if(name.length > 2) {
-                localStorage.setItem('up-t-user', name);
-                user = name; window.goTo(2);
+        window.castVote = async function() {
+            try { await updateDoc(docRef, { votes: increment(1) }); } catch(e) {}
+        };
+
+        window.createRoom = async function() {
+            const t = document.getElementById('room-title-in').value;
+            const d = document.getElementById('room-timer-in').value;
+            if(!user) { alert("Nomme-toi d'abord !"); window.goTo(1); window.closeModal(); return; }
+            if(t && d) {
+                await addDoc(roomsCol, { title: t, timer: d, author: user, createdAt: Date.now() });
+                window.closeModal();
             }
         };
 
         document.getElementById('file-input').addEventListener('change', (e) => {
             const f = e.target.files[0];
-            const r = new FileReader();
-            r.onloadend = async () => { await updateDoc(docRef, { photoBase64: r.result, author: user }); };
-            if(f) r.readAsDataURL(f);
+            const reader = new FileReader();
+            reader.onloadend = async () => { await updateDoc(docRef, { photoBase64: reader.result, author: user }); };
+            if(f) reader.readAsDataURL(f);
         });
 
-        // Navigation
+        window.openModal = () => document.getElementById('room-modal').style.display = 'flex';
+        window.closeModal = () => document.getElementById('room-modal').style.display = 'none';
+
+        // Nav Logic
         let cur = 2; let sX = 0;
         window.goTo = function(idx) {
             cur = idx;
