@@ -176,17 +176,20 @@
         // APP LOGIC
         window.saveProfile = () => { const n = document.getElementById('username-input').value; if(n) { localStorage.getItem('up-t-user', n); localStorage.setItem('up-t-user', n); user = n; goTo(2); } };
         window.handlePost = () => { 
-    // On récupère la valeur la plus fraîche du stockage
-    const checkUser = localStorage.getItem('up-t-user');
+    // 1. On va chercher l'info à la source
+    const storedUser = localStorage.getItem('up-t-user');
     
-    if(!checkUser || checkUser.length < 2) { 
-        alert("IDENTIFICATION REQUISE : Entre ton nom de pilote d'abord !"); 
-        goTo(1); // Redirection immédiate vers le Profil
-    } else { 
-        // Si le nom est OK, on met à jour la variable globale et on ouvre la galerie
-        user = checkUser;
-        document.getElementById('file-input').click(); 
+    // 2. Si le stockage est vide OU si la variable est vide
+    if (!storedUser || storedUser === "" || storedUser === "null") { 
+        alert("🔒 ACCÈS REFUSÉ : Enregistre ton nom de pilote sur la page Profil !"); 
+        window.goTo(1); // On te renvoie au profil
+        return; // ON ARRÊTE TOUT ICI
     } 
+
+    // 3. Si on est là, c'est que l'utilisateur est valide
+    user = storedUser; 
+    console.log("Pilote identifié : " + user);
+    document.getElementById('file-input').click(); 
 };
         window.castVote = async () => { await updateDoc(docRef, { votes: increment(1) }); };
         window.createRoom = async () => {
