@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | V6.5 Clean Engine</title>
+    <title>Up-T | V6.7 Multi-Feed</title>
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #000000; --glass: rgba(255, 255, 255, 0.1); }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: var(--bg-dark); font-family: 'Inter', sans-serif; color: white; touch-action: none; }
 
-        /* GPS & TASKBAR */
+        /* NAVIGATION & UI */
         #gps-container { position: fixed; bottom: 55px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 1001; }
         .dot { width: 5px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 50%; transition: 0.4s; }
         .dot.active { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); transform: scale(1.3); }
@@ -17,37 +17,35 @@
         .nav-item.active { opacity: 1; color: var(--neon-blue); }
         .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
 
-        /* VIEWPORT */
+        /* VIEWPORT NAVIGATION */
         #main-viewport { display: flex; width: 500vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1); transform: translateX(-200vw); }
         .page { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* CARROSSE */
-        .story-container { width: 100%; height: 100%; background: #000; }
+        /* CARROSSE (FEED) */
+        .story-container { width: 100%; height: 100%; background: #000; position: relative; }
         #carrosse-media { width: 100%; height: 100%; object-fit: cover; }
         .fab-container { position: absolute; bottom: 110px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; }
-        .fab { width: 56px; height: 56px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: none; }
+        .fab { width: 56px; height: 56px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: none; cursor: pointer; position: relative; }
         .fab svg { width: 28px; height: 28px; fill: black !important; }
+        #vote-count { position: absolute; top: -15px; background: var(--neon-blue); color: black; padding: 2px 8px; border-radius: 10px; font-weight: 900; font-size: 0.75rem; box-shadow: 0 0 10px var(--neon-blue); }
 
-        /* MUR & SALONS */
+        /* SALONS & CHAT */
         #room-list { flex: 1; overflow-y: auto; padding: 20px; padding-top: 80px; padding-bottom: 60px; display: flex; flex-direction: column; gap: 12px; }
-        .room-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 4px solid var(--neon-blue); cursor: pointer; }
+        .room-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 4px solid var(--neon-blue); }
         .room-header { display: flex; justify-content: space-between; align-items: center; }
         .room-title { font-weight: 800; color: var(--neon-blue); }
-        .room-timer { font-size: 0.8rem; font-weight: bold; }
-        #create-room-btn { position: absolute; top: 20px; right: 20px; background: var(--neon-blue); color: black; border: none; padding: 10px 15px; border-radius: 20px; font-weight: 900; z-index: 10; }
-
-        /* CHAT OVERLAY */
         #chat-overlay { display: none; position: absolute; inset: 0; background: black; z-index: 1005; flex-direction: column; }
         #messages-display { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
         .msg { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #222; }
-        .msg-u { color: var(--neon-blue); font-size: 0.7rem; font-weight: 800; }
+        .msg-u { color: var(--neon-blue); font-size: 0.7rem; font-weight: 800; margin-bottom: 4px; }
         #chat-bar { padding: 10px; display: flex; gap: 10px; background: #080808; border-top: 1px solid #222; margin-bottom: 50px; }
-        #chat-bar input { flex: 1; background: #111; border: 1px solid #333; color: white; padding: 10px; border-radius: 20px; }
+        #chat-bar input { flex: 1; background: #111; border: 1px solid #333; color: white; padding: 12px; border-radius: 20px; }
 
-        /* MODAL */
+        /* MODALS & INPUTS */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
-        .modal input { width: 100%; padding: 15px; background: #111; border: 1px solid #333; color: white; margin-bottom: 10px; border-radius: 10px; text-align: center; }
-        h1 { font-size: 0.8rem; letter-spacing: 5px; text-align: center; margin-top: 25px; opacity: 0.3; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 15px; background: #111; border: 1px solid #333; color: white; margin-bottom: 10px; border-radius: 10px; text-align: center; }
+        #create-room-btn { position: absolute; top: 20px; right: 20px; background: var(--neon-blue); color: black; border: none; padding: 10px 15px; border-radius: 20px; font-weight: 900; z-index: 10; }
+        h1, h2 { font-size: 0.8rem; letter-spacing: 5px; opacity: 0.5; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -66,7 +64,7 @@
         <div class="page"><h1>Missions</h1></div>
         <div class="page">
             <div style="margin: auto; width: 80%; text-align: center;">
-                <h2>PROFIL</h2>
+                <h2>PILOTE</h2>
                 <input type="text" id="username-input" placeholder="TON NOM">
                 <button onclick="saveProfile()" style="width:100%; padding:15px; background:white; color:black; border-radius:10px; font-weight:900;">ACTIVER</button>
             </div>
@@ -76,10 +74,13 @@
                 <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800" id="carrosse-media">
                 <div class="fab-container">
                     <button class="fab" onclick="handlePost()"><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></button>
-                    <button class="fab" onclick="castVote()"><div id="vote-count" style="position:absolute; top:-20px; background:white; color:black; padding:2px 5px; border-radius:5px; font-size:0.7rem;">0</div><svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg></button>
+                    <button class="fab" onclick="castVote()">
+                        <div id="vote-count">0</div>
+                        <svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
+                    </button>
                 </div>
             </div>
-            <input type="file" id="file-input" style="display:none">
+            <input type="file" id="file-input" style="display:none" accept="image/*">
         </div>
         <div class="page"><h1>Classement</h1></div>
         <div class="page">
@@ -113,29 +114,76 @@
 
         const firebaseConfig = {
             apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk",
-
-  authDomain: "up-t-network.firebaseapp.com",
-
-  projectId: "up-t-network",
-
-  storageBucket: "up-t-network.firebasestorage.app",
-
-  messagingSenderId: "1066469813456",
-
-  appId: "1:1066469813456:web:4b660350832ea1d95702d5",
-
-  measurementId: "G-7CSRYYCZWV"
-
+            authDomain: "up-t-network.firebaseapp.com",
+            projectId: "up-t-network",
+            storageBucket: "up-t-network.firebasestorage.app",
+            messagingSenderId: "1066469813456",
+            appId: "1:1066469813456:web:4b660350832ea1d95702d5",
+            measurementId: "G-7CSRYYCZWV"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const docRef = doc(db, "challenges", "week_01");
         const roomsCol = collection(db, "rooms");
+        const postsCol = collection(db, "posts");
+        
         let user = localStorage.getItem('up-t-user');
         let currentRoomId = null;
+        let currentPostId = null; // ID du post actuellement affiché
 
-        // TIMER ENGINE
+        // --- MOTEUR DE FLUX PHOTO (CARROSSE) ---
+        const latestPostQuery = query(postsCol, orderBy("createdAt", "desc"), limit(1));
+        onSnapshot(latestPostQuery, (snap) => {
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                currentPostId = docSnap.id;
+                document.getElementById('carrosse-media').src = data.photoBase64;
+                document.getElementById('vote-count').innerText = data.votes || 0;
+            });
+        });
+
+        window.handlePost = () => {
+            const storedUser = localStorage.getItem('up-t-user');
+            if (!storedUser || storedUser === "null" || storedUser.trim() === "") {
+                alert("🔒 ACCÈS REFUSÉ : Enregistre ton nom de pilote !");
+                goTo(1);
+            } else {
+                user = storedUser;
+                document.getElementById('file-input').click();
+            }
+        };
+
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                await addDoc(postsCol, {
+                    photoBase64: reader.result,
+                    author: user,
+                    votes: 0,
+                    createdAt: Date.now()
+                });
+            };
+            if(file) reader.readAsDataURL(file);
+        });
+
+        window.castVote = async () => {
+            if(!currentPostId) return;
+            const postRef = doc(db, "posts", currentPostId);
+            await updateDoc(postRef, { votes: increment(1) });
+        };
+
+        // --- MOTEUR DE PROFILS ---
+        window.saveProfile = () => {
+            const n = document.getElementById('username-input').value.trim();
+            if(n.length > 1) {
+                localStorage.setItem('up-t-user', n);
+                user = n;
+                goTo(2);
+            }
+        };
+
+        // --- MOTEUR DE SALONS & TIMERS ---
         function updateTimers() {
             document.querySelectorAll('.room-timer').forEach(span => {
                 const endsAt = parseInt(span.getAttribute('data-ends'));
@@ -152,15 +200,6 @@
         }
         setInterval(updateTimers, 1000);
 
-        // DATA LISTENER
-        onSnapshot(docRef, (snap) => {
-            if (snap.exists()) {
-                const d = snap.data();
-                document.getElementById('vote-count').innerText = d.votes || 0;
-                if(d.photoBase64) document.getElementById('carrosse-media').src = d.photoBase64;
-            }
-        });
-
         onSnapshot(query(roomsCol, orderBy("createdAt", "desc")), (snap) => {
             const list = document.getElementById('room-list'); list.innerHTML = "";
             snap.forEach(docSnap => {
@@ -173,39 +212,13 @@
             updateTimers();
         });
 
-        // APP LOGIC
-        window.saveProfile = () => { 
-    const input = document.getElementById('username-input');
-    const name = input.value.trim(); 
-    
-    if(name.length >= 2) { 
-        localStorage.setItem('up-t-user', name); // On grave dans le disque dur
-        user = name; 
-        console.log("Pilote enregistré : " + name);
-        goTo(2); // On décolle vers le Carrosse
-    } else {
-        alert("NÉGATIF : Ton nom doit faire au moins 2 caractères.");
-    }
-};
-
-window.handlePost = () => { 
-    // On vérifie le stockage DIRECTEMENT
-    const activeUser = localStorage.getItem('up-t-user');
-    
-    if (!activeUser || activeUser === "null" || activeUser.trim() === "") { 
-        alert("🔒 IDENTIFICATION REQUISE : Redirection vers le profil..."); 
-        goTo(1); // Retour forcé au profil
-        return; // ON COUPE LE MOTEUR ICI
-    } 
-
-    // Si on arrive ici, l'identité est confirmée
-    user = activeUser;
-    document.getElementById('file-input').click(); 
-};
-        window.castVote = async () => { await updateDoc(docRef, { votes: increment(1) }); };
         window.createRoom = async () => {
-            const t = document.getElementById('room-title-in').value; const d = parseInt(document.getElementById('room-timer-in').value);
-            if(t && d && user) { await addDoc(roomsCol, { title: t, author: user, createdAt: Date.now(), endsAt: Date.now() + (d * 60000) }); closeModal(); }
+            const t = document.getElementById('room-title-in').value;
+            const d = parseInt(document.getElementById('room-timer-in').value);
+            if(t && d && user) {
+                await addDoc(roomsCol, { title: t, author: user, createdAt: Date.now(), endsAt: Date.now() + (d * 60000) });
+                closeModal();
+            }
         };
 
         window.openChat = (id, title) => {
@@ -220,10 +233,13 @@ window.handlePost = () => {
 
         window.sendMsg = async () => {
             const inp = document.getElementById('chat-input');
-            if(inp.value.trim() && currentRoomId) { await addDoc(collection(db, `rooms/${currentRoomId}/messages`), { user, text: inp.value, time: Date.now() }); inp.value = ""; }
+            if(inp.value.trim() && currentRoomId) {
+                await addDoc(collection(db, `rooms/${currentRoomId}/messages`), { user, text: inp.value, time: Date.now() });
+                inp.value = "";
+            }
         };
 
-        // UI & NAVIGATION
+        // --- NAVIGATION ---
         let cur = 2; let sX = 0;
         window.goTo = (i) => {
             cur = i; document.getElementById('main-viewport').style.transform = `translateX(${-i*100}vw)`;
@@ -240,12 +256,6 @@ window.handlePost = () => {
         window.closeChat = () => document.getElementById('chat-overlay').style.display = 'none';
         window.openModal = () => document.getElementById('room-modal').style.display = 'flex';
         window.closeModal = () => document.getElementById('room-modal').style.display = 'none';
-
-        document.getElementById('file-input').addEventListener('change', (e) => {
-            const f = e.target.files[0]; const r = new FileReader();
-            r.onloadend = async () => { await updateDoc(docRef, { photoBase64: r.result, author: user }); };
-            if(f) r.readAsDataURL(f);
-        });
     </script>
 </body>
 </html>
