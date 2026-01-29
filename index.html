@@ -174,19 +174,33 @@
         });
 
         // APP LOGIC
-        window.saveProfile = () => { const n = document.getElementById('username-input').value; if(n) { localStorage.getItem('up-t-user', n); localStorage.setItem('up-t-user', n); user = n; goTo(2); } };
-        window.handlePost = () => {
-    alert("TEST : Je vérifie le stockage...");
-    const testUser = localStorage.getItem('up-t-user');
-    alert("Valeur trouvée : " + testUser);
+        window.saveProfile = () => { 
+    const input = document.getElementById('username-input');
+    const name = input.value.trim(); 
     
-    if (!testUser) {
-        alert("Action : Blocage et redirection !");
-        window.goTo(1);
+    if(name.length >= 2) { 
+        localStorage.setItem('up-t-user', name); // On grave dans le disque dur
+        user = name; 
+        console.log("Pilote enregistré : " + name);
+        goTo(2); // On décolle vers le Carrosse
     } else {
-        alert("Action : Ouverture galerie !");
-        document.getElementById('file-input').click();
+        alert("NÉGATIF : Ton nom doit faire au moins 2 caractères.");
     }
+};
+
+window.handlePost = () => { 
+    // On vérifie le stockage DIRECTEMENT
+    const activeUser = localStorage.getItem('up-t-user');
+    
+    if (!activeUser || activeUser === "null" || activeUser.trim() === "") { 
+        alert("🔒 IDENTIFICATION REQUISE : Redirection vers le profil..."); 
+        goTo(1); // Retour forcé au profil
+        return; // ON COUPE LE MOTEUR ICI
+    } 
+
+    // Si on arrive ici, l'identité est confirmée
+    user = activeUser;
+    document.getElementById('file-input').click(); 
 };
         window.castVote = async () => { await updateDoc(docRef, { votes: increment(1) }); };
         window.createRoom = async () => {
