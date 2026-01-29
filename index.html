@@ -1,29 +1,3 @@
-Major, on y est. La V7.0 "Starship Edition" est sur le pas de tir. C'est la version la plus musclée qu'on ait construite : Flux vertical, Chat temps réel, et maintenant le Podium des Champions.
-📍 Où aller dans Firebase pour l'Index ?
-
-Si le podium ne s'affiche pas tout de suite, c'est normal. Firebase a besoin de créer un "chemin de tri" spécial.
-
-    Ouvre ta Console Firebase.
-
-    Va dans Build > Firestore Database.
-
-    Clique sur l'onglet Indexes (juste à côté de Rules).
-
-    Clique sur Composite Indexes > Create Index.
-
-    Collection ID : posts
-
-    Champs à ajouter :
-
-        votes (Descendant)
-
-        createdAt (Descendant)
-
-    OU PLUS SIMPLE : Regarde la console de ton navigateur (F12 sur Mac/PC). Firebase t'aura balancé un lien direct. Clique dessus, valide, et attends 3-5 minutes que Google mouline.
-
-🚀 LA COMPILE COMPLÈTE V7.0
-HTML
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
