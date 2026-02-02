@@ -1,1 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Up-T | V7.2 Tactical Starship</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Up-T">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180/000000/00f3ff?text=Up-T">
+    
+    <style>
+        :root { --neon: #00f3ff; --bg: #000000; --glass: rgba(255, 255, 255, 0.1); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Inter', sans-serif; color: white; }
 
+        /* SPLASH SCREEN */
+        #splash-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .tron-logo { width: 280px; filter: drop-shadow(0 0 15px var(--neon)); }
+        .path { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 2.5s ease-in-out forwards; stroke: var(--neon); stroke-width: 1.5; fill: none; }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        .flash-active { animation: finalFlash 1.2s forwards; }
+        @keyframes finalFlash { 0% { filter: brightness(1); } 50% { filter: brightness(20); background: white; } 100% { opacity: 0; visibility: hidden; } }
+
+        /* APP STRUCTURE */
+        #app-content { opacity: 0; transition: opacity 1s ease; height: 100%; }
+        #app-content.ready { opacity: 1; }
+        #main-viewport { display: flex; width: 500vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1); transform: translateX(-200vw); }
+        .page { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; overflow: hidden; }
+
+        /* FEED & UI */
+        #carrosse-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+        .post-card { width: 100vw; height: 100vh; position: relative; scroll-snap-align: start; flex-shrink: 0; }
+        .post-card img { width: 100%; height: 100%; object-fit: cover; }
+        .post-info { position: absolute; bottom: 120px; left: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .vote-section { position: absolute; bottom: 180px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .vote-btn { width: 52px; height: 52px; background: white; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--neon); }
+        .vote-counter { font-weight: 900; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        #taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 45px; background: var(--glass); backdrop-filter: blur(20px); display: flex; justify-content: space-around; align-items: center; z-index: 1000; border-top: 1px solid rgba(255,255,255,0.1); }
+        .nav-item { opacity: 0.3; color: white; transition: 0.3s; }
+        .nav-item.active { opacity: 1; color: var(--neon); }
+        .fab { width: 56px; height: 56px; background: white; border-radius: 50%; border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.5); cursor: pointer; }
+        input { width: 80%; padding: 15px; background: #111; border: 1px solid #333; color: white; border-radius: 10px; text-align: center; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <svg class="tron-logo" viewBox="0 0 200 80">
+            <path class="path" d="M30,20 L30,50 Q30,65 50,65 L55,65 Q75,65 75,50 L75,20 M90,30 L90,70 M90,45 Q115,30 140,45 M130,25 L170,25 M150,25 L150,70" />
+            <text x="42" y="52" fill="var(--neon)" font-family="Arial Black" font-size="28" style="opacity:0.2">Up-T</text>
+        </svg>
+    </div>
+
+    <div id="app-content">
+        <nav id="taskbar">
+            <div class="nav-item" onclick="goTo(0)"><svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
+            <div class="nav-item" onclick="goTo(1)"><svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+            <div class="nav-item active" onclick="goTo(2)"><svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg></div>
+            <div class="nav-item" onclick="goTo(3)"><svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 10.63 21 8.55 21 8V7c0-1.1-.9-2-2-2z"/></svg></div>
+            <div class="nav-item" onclick="goTo(4)"><svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
+        </nav>
+
+        <div id="main-viewport">
+            <div class="page"></div>
+            <div class="page" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                <h2>PILOTE</h2>
+                <input type="text" id="username-input" placeholder="TON NOM">
+                <button onclick="saveProfile()" style="width:80%; padding:15px; background:white; color:black; font-weight:900; border:none; border-radius:10px;">ACTIVER</button>
+            </div>
+            <div class="page">
+                <div id="carrosse-feed"></div>
+                <div style="position:absolute; bottom:110px; width:100%; display:flex; justify-content:center; pointer-events:none;">
+                    <button class="fab" onclick="handlePost()" style="pointer-events:auto;">
+                        <svg viewBox="0 0 24 24" width="28" fill="black"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                    </button>
+                </div>
+                <input type="file" id="file-input" style="display:none" accept="image/*">
+            </div>
+            <div class="page">
+                <div style="padding:40px 20px;">
+                    <h2 style="text-align:center; color:var(--neon); letter-spacing:10px;">PODIUM</h2>
+                    <div id="podium-list"></div>
+                </div>
+            </div>
+            <div class="page"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, updateDoc, increment, onSnapshot, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk",
+            authDomain: "up-t-network.firebaseapp.com",
+            projectId: "up-t-network",
+            storageBucket: "up-t-network.firebasestorage.app",
+            messagingSenderId: "1066469813456",
+            appId: "1:1066469813456:web:4b660350832ea1d95702d5",
+            measurementId: "G-7CSRYYCZWV"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const postsCol = collection(db, "posts");
+        let user = localStorage.getItem('up-t-user');
+
+        setTimeout(() => {
+            document.getElementById('splash-screen').classList.add('flash-active');
+            setTimeout(() => { 
+                document.getElementById('splash-screen').style.display = 'none';
+                document.getElementById('app-content').classList.add('ready');
+            }, 1000);
+        }, 3000);
+
+        onSnapshot(query(postsCol, orderBy("createdAt", "desc")), (snap) => {
+            const feed = document.getElementById('carrosse-feed'); feed.innerHTML = "";
+            snap.forEach(docSnap => {
+                const d = docSnap.data(); const id = docSnap.id;
+                feed.innerHTML += `
+                <div class="post-card">
+                    <img src="${d.photoBase64}">
+                    <div class="post-info"><div style="color:var(--neon); font-weight:900;">@${d.author || 'Pilote'}</div></div>
+                    <div class="vote-section">
+                        <button class="vote-btn" onclick="castVote('${id}')"><svg viewBox="0 0 24 24" width="24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg></button>
+                        <div class="vote-counter">${d.votes || 0} 🔥</div>
+                    </div>
+                </div>`;
+            });
+        });
+
+        onSnapshot(query(postsCol, orderBy("votes", "desc"), limit(10)), (snap) => {
+            const list = document.getElementById('podium-list'); list.innerHTML = "";
+            let rank = 1;
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:15px; background:rgba(255,255,255,0.05); margin-bottom:10px; border-radius:10px; border-left:4px solid ${rank==1?'var(--neon)':'white'}">
+                    <span>#${rank} ${d.author}</span><span>${d.votes} 🔥</span>
+                </div>`;
+                rank++;
+            });
+        });
+
+        window.castVote = async (id) => { await updateDoc(doc(db, "posts", id), { votes: increment(1) }); };
+        window.handlePost = () => { if(user) document.getElementById('file-input').click(); else goTo(1); };
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            const f = e.target.files[0]; const r = new FileReader();
+            r.onloadend = async () => { if(r.result) await addDoc(postsCol, { photoBase64: r.result, author: user, votes: 0, createdAt: Date.now() }); };
+            if(f) r.readAsDataURL(f);
+        });
+
+        window.saveProfile = () => { 
+            const n = document.getElementById('username-input').value.trim();
+            if(n) { localStorage.setItem('up-t-user', n); user = n; goTo(2); }
+        };
+
+        window.goTo = (i) => {
+            document.getElementById('main-viewport').style.transform = `translateX(${-i*100}vw)`;
+            document.querySelectorAll('.nav-item').forEach((n,idx) => n.classList.toggle('active', idx===i));
+        };
+    </script>
+</body>
+</html>
