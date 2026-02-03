@@ -3,93 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | V7.5 Full Power</title>
+    <title>Up-T | V7.6 Stable</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Inter:wght@400;900&display=swap" rel="stylesheet">
-    
     <style>
-        :root { --neon: #00f3ff; --bg: #000000; --glass: rgba(255, 255, 255, 0.1); }
+        :root { --neon: #00f3ff; --bg: #000000; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Inter', sans-serif; color: white; }
-
-        /* --- SPLASH TRON 2.0 --- */
-        #splash-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
-        .tron-text { font-family: 'Orbitron'; font-size: 60px; color: transparent; -webkit-text-stroke: 1px var(--neon); letter-spacing: 8px; position: relative; filter: drop-shadow(0 0 10px var(--neon)); }
-        .tron-text::after { content: "Up-T"; position: absolute; left: 0; top: 0; width: 100%; height: 100%; color: var(--neon); overflow: hidden; clip-path: inset(0 100% 0 0); animation: fill-text 1.2s ease-in forwards, white-out 0.3s 1.2s forwards; text-shadow: 0 0 20px var(--neon); }
-        @keyframes fill-text { to { clip-path: inset(0 0 0 0); } }
-        @keyframes white-out { to { color: #ffffff; text-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff; filter: brightness(2); } }
-        .shockwave { position: absolute; width: 10px; height: 10px; background: white; border-radius: 50%; opacity: 0; }
-        .shock-active { animation: shock 0.5s ease-out forwards; }
-        @keyframes shock { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(100); opacity: 0; } }
-
-        /* --- CORE UI --- */
-        #app-content { opacity: 0; transition: opacity 0.5s; height: 100%; }
-        #app-content.ready { opacity: 1; }
-        #main-viewport { display: flex; width: 500vw; height: 100vh; transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1); transform: translateX(-200vw); }
-        .page { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; overflow-y: auto; overflow-x: hidden; }
-
-        /* FEED CARDS */
-        #carrosse-feed { scroll-snap-type: y mandatory; overflow-y: scroll; height: 100vh; }
-        .post-card { width: 100vw; height: 100vh; scroll-snap-align: start; position: relative; }
-        .post-card img { width: 100%; height: 100%; object-fit: cover; }
-        .post-actions { position: absolute; right: 20px; bottom: 150px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
-        .btn-vote { width: 55px; height: 55px; border-radius: 50%; background: white; border: none; font-size: 24px; box-shadow: 0 0 15px var(--neon); }
         
+        /* SPLASH QUICK */
+        #splash { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .t-tron { font-family: 'Orbitron'; font-size: 50px; color: var(--neon); text-shadow: 0 0 20px var(--neon); animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* UI */
+        #app-content { opacity: 0; transition: 0.5s; height: 100%; }
+        #view { display: flex; width: 500vw; height: 100vh; transition: transform 0.4s ease-out; transform: translateX(-200vw); }
+        .page { width: 100vw; height: 100vh; flex-shrink: 0; overflow-y: auto; position: relative; }
+        
+        /* FEED */
+        .post { width: 100vw; height: 100vh; position: relative; scroll-snap-align: start; background: #111; border-bottom: 1px solid #222; }
+        .post img { width: 100%; height: 100%; object-fit: cover; }
+        .v-btn { position: absolute; right: 20px; bottom: 120px; width: 60px; height: 60px; border-radius: 50%; border: none; background: white; font-size: 25px; box-shadow: 0 0 15px var(--neon); }
+
         /* CHAT */
-        #chat-container { height: 70vh; padding: 20px; display: flex; flex-direction: column; gap: 10px; margin-top: 50px; }
-        .msg { padding: 10px; background: var(--glass); border-left: 3px solid var(--neon); border-radius: 5px; max-width: 80%; }
+        #c-list { height: 75vh; overflow-y: auto; padding: 20px; margin-top: 40px; display: flex; flex-direction: column; gap: 8px; }
+        .m { padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; border-left: 3px solid var(--neon); font-size: 0.9rem; }
         
         /* NAV */
-        #taskbar { position: fixed; bottom: 0; width: 100%; height: 65px; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--neon); z-index: 1000; }
-        .nav-item { font-size: 24px; opacity: 0.3; transition: 0.3s; }
-        .nav-item.active { opacity: 1; filter: drop-shadow(0 0 8px var(--neon)); color: var(--neon); }
-        .fab { width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); border: none; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--neon); z-index: 100; }
+        .n { font-size: 22px; opacity: 0.4; }
+        .n.active { opacity: 1; color: var(--neon); }
     </style>
 </head>
 <body>
 
-    <div id="splash-screen">
-        <div class="tron-text">Up-T</div>
-        <div id="shock" class="shockwave"></div>
-    </div>
+    <div id="splash"><div class="t-tron">Up-T</div></div>
 
     <div id="app-content">
-        <div id="main-viewport">
-            <div class="page" id="post-page"> <div style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                    <button class="btn-vote" style="width:120px; height:120px;" onclick="document.getElementById('file-input').click()">📸</button>
-                    <p>PUBLIER UN SCAN</p>
-                </div>
+        <div id="view">
+            <div class="page" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                <button onclick="document.getElementById('f-in').click()" style="width:100px; height:100px; border-radius:50%; border:none; background:var(--neon); font-size:40px;">📸</button>
+                <p>PUBLIER</p>
             </div>
-            
-            <div class="page" id="profile-page"> <div style="padding:100px 20px; text-align:center;">
-                    <h2 style="font-family:Orbitron;">PILOTE</h2>
-                    <input type="text" id="username-input" style="width:80%; padding:15px; background:#111; border:1px solid var(--neon); color:white; border-radius:10px; text-align:center;">
-                    <button onclick="saveProfile()" style="margin-top:20px; width:85%; padding:15px; background:white; color:black; font-weight:900; border:none; border-radius:10px;">SAUVEGARDER</button>
-                </div>
+            <div class="page" style="padding:100px 20px; text-align:center;">
+                <h2>PILOTE</h2>
+                <input type="text" id="u-in" placeholder="Nom..." style="padding:15px; width:80%; background:#222; border:1px solid var(--neon); color:white; border-radius:10px;">
+                <button onclick="saveU()" style="margin-top:20px; padding:15px 40px; border-radius:10px; border:none; font-weight:900;">OK</button>
             </div>
-
-            <div class="page" id="carrosse-feed"></div> <div class="page" id="podium-page"> <div style="padding:60px 20px;">
-                    <h2 style="font-family:Orbitron; color:var(--neon); text-align:center;">PODIUM</h2>
-                    <div id="podium-list"></div>
-                </div>
-            </div>
-
-            <div class="page" id="chat-page"> <div id="chat-container"></div>
-                <div style="padding: 10px; display: flex; gap: 5px; position: fixed; bottom: 80px; width: 95%;">
-                    <input type="text" id="chat-input" style="flex:1; background:#111; border:1px solid var(--neon); color:white; padding:12px; border-radius:5px;" placeholder="Transmission...">
-                    <button onclick="sendMsg()" style="background:var(--neon); border:none; padding:12px; border-radius:5px;">⚡</button>
+            <div class="page" id="feed"></div>
+            <div class="page" id="podium"></div>
+            <div class="page">
+                <div id="c-list"></div>
+                <div style="position:fixed; bottom:80px; width:90%; left:5%; display:flex; gap:5px;">
+                    <input type="text" id="c-in" style="flex:1; padding:12px; background:#222; border:1px solid var(--neon); color:white; border-radius:5px;" placeholder="Message...">
+                    <button onclick="sMsg()" style="padding:12px; background:var(--neon); border:none; border-radius:5px;">⚡</button>
                 </div>
             </div>
         </div>
-
-        <input type="file" id="file-input" style="display:none" accept="image/*">
-
-        <nav id="taskbar">
-            <div class="nav-item" onclick="goTo(0)">➕</div>
-            <div class="nav-item" onclick="goTo(1)">👤</div>
-            <div class="nav-item active" onclick="goTo(2)">🚀</div>
-            <div class="nav-item" onclick="goTo(3)">🏆</div>
-            <div class="nav-item" onclick="goTo(4)">💬</div>
+        <input type="file" id="f-in" style="display:none" accept="image/*">
+        <nav>
+            <div class="n" onclick="go(0)">➕</div>
+            <div class="n" onclick="go(1)">👤</div>
+            <div class="n active" onclick="go(2)">🚀</div>
+            <div class="n" onclick="go(3)">🏆</div>
+            <div class="n" onclick="go(4)">💬</div>
         </nav>
     </div>
 
@@ -97,7 +75,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = { 
+        const config = { 
             apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk", 
             authDomain: "up-t-network.firebaseapp.com", 
             projectId: "up-t-network", 
@@ -105,90 +83,63 @@
             messagingSenderId: "1066469813456", 
             appId: "1:1066469813456:web:4b660350832ea1d95702d5" 
         };
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(config);
         const db = getFirestore(app);
-        let user = localStorage.getItem('up-t-user') || "Anonyme";
+        let user = localStorage.getItem('u') || "Anonyme";
+        document.getElementById('u-in').value = user;
 
-        // --- SPLASH TACTIQUE ---
-        setTimeout(() => {
-            document.getElementById('shock').classList.add('shock-active');
-            setTimeout(() => {
-                document.getElementById('splash-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('splash-screen').style.display = 'none';
-                    document.getElementById('app-content').classList.add('ready');
-                }, 500);
-            }, 300);
-        }, 1800);
+        // Splash
+        setTimeout(() => { 
+            document.getElementById('splash').style.display = 'none';
+            document.getElementById('app-content').style.opacity = '1';
+        }, 1500);
 
-        // --- NAVIGATION ---
-        window.goTo = (i) => {
-            document.getElementById('main-viewport').style.transform = `translateX(${-i*100}vw)`;
-            document.querySelectorAll('.nav-item').forEach((n,idx) => n.classList.toggle('active', idx===i));
+        // Nav
+        window.go = (i) => {
+            document.getElementById('view').style.transform = `translateX(${-i*100}vw)`;
+            document.querySelectorAll('.n').forEach((el, idx) => el.classList.toggle('active', i === idx));
         };
 
-        // --- PROFIL ---
-        window.saveProfile = () => {
-            const val = document.getElementById('username-input').value.trim();
-            if(val) { localStorage.setItem('up-t-user', val); user = val; alert("Profil mis à jour !"); goTo(2); }
-        };
+        // Profil
+        window.saveU = () => { user = document.getElementById('u-in').value; localStorage.setItem('u', user); go(2); };
 
-        // --- FEED & VOTES ---
-        onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc")), (snap) => {
-            const feed = document.getElementById('carrosse-feed'); feed.innerHTML = "";
-            snap.forEach(docSnap => {
-                const d = docSnap.data(); const id = docSnap.id;
-                feed.innerHTML += `
-                <div class="post-card">
-                    <img src="${d.photoBase64}">
-                    <div style="position:absolute; bottom:100px; left:20px; font-weight:900;">@${d.author}</div>
-                    <div class="post-actions">
-                        <button class="btn-vote" onclick="castVote('${id}')">🔥</button>
-                        <span style="background:black; padding:5px 10px; border-radius:20px;">${d.votes || 0}</span>
-                    </div>
-                </div>`;
-            });
-        });
-
-        window.castVote = async (id) => { await updateDoc(doc(db, "posts", id), { votes: increment(1) }); };
-
-        // --- PUBLICATION ---
-        document.getElementById('file-input').addEventListener('change', (e) => {
-            const f = e.target.files[0]; const r = new FileReader();
-            r.onloadend = async () => { 
-                await addDoc(collection(db, "posts"), { photoBase64: r.result, author: user, votes: 0, createdAt: Date.now() }); 
-                goTo(2);
+        // Post
+        document.getElementById('f-in').onchange = (e) => {
+            const f = e.target.files[0];
+            const r = new FileReader();
+            r.readAsDataURL(f);
+            r.onload = async () => {
+                try {
+                    await addDoc(collection(db, "posts"), { img: r.result, user, v: 0, t: Date.now() });
+                    go(2);
+                } catch(e) { alert("Erreur post !"); }
             };
-            if(f) r.readAsDataURL(f);
-        });
+        };
 
-        // --- PODIUM ---
-        onSnapshot(query(collection(db, "posts"), orderBy("votes", "desc"), limit(10)), (snap) => {
-            const list = document.getElementById('podium-list'); list.innerHTML = "";
-            snap.forEach((docSnap, i) => {
-                const d = docSnap.data();
-                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:15px; background:var(--glass); margin-bottom:10px; border-radius:10px; border-left:4px solid ${i==0?'var(--neon)':'white'}">
-                    <span>#${i+1} ${d.author}</span><span>${d.votes} 🔥</span>
-                </div>`;
+        // Feed
+        onSnapshot(query(collection(db, "posts"), orderBy("t", "desc")), (s) => {
+            const f = document.getElementById('feed'); f.innerHTML = "";
+            s.forEach(d => {
+                const data = d.data();
+                f.innerHTML += `<div class="post"><img src="${data.img}"><div style="position:absolute; bottom:120px; left:20px; font-weight:900;">@${data.user}</div><button class="v-btn" onclick="v('${d.id}')">🔥</button><div style="position:absolute; right:35px; bottom:95px; font-weight:bold;">${data.v||0}</div></div>`;
             });
         });
 
-        // --- CHAT ---
-        window.sendMsg = async () => {
-            const input = document.getElementById('chat-input');
-            if(input.value.trim()){
-                await addDoc(collection(db, "chats"), { user, msg: input.value, time: Date.now() });
-                input.value = "";
+        window.v = async (id) => { await updateDoc(doc(db, "posts", id), { v: increment(1) }); };
+
+        // Chat
+        window.sMsg = async () => {
+            const i = document.getElementById('c-in');
+            if(i.value.trim()){
+                await addDoc(collection(db, "chats"), { u: user, m: i.value, t: Date.now() });
+                i.value = "";
             }
         };
 
-        onSnapshot(query(collection(db, "chats"), orderBy("time", "desc"), limit(50)), (snap) => {
-            const container = document.getElementById('chat-container');
-            container.innerHTML = snap.docs.map(doc => {
-                const d = doc.data();
-                return `<div class="msg"><b>${d.user}</b>${d.msg}</div>`;
-            }).reverse().join('');
-            container.scrollTop = container.scrollHeight;
+        onSnapshot(query(collection(db, "chats"), orderBy("t", "desc"), limit(30)), (s) => {
+            const l = document.getElementById('c-list');
+            l.innerHTML = s.docs.map(d => `<div class="m"><b>${d.data().u}:</b> ${d.data().m}</div>`).reverse().join('');
+            l.scrollTop = l.scrollHeight;
         });
     </script>
 </body>
