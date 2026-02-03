@@ -59,6 +59,24 @@
         #taskbar { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--tron-blue); z-index: 100; }
         .nav-item { color: white; opacity: 0.4; transition: 0.3s; }
         .nav-item.active { color: var(--neon); opacity: 1; filter: drop-shadow(0 0 5px var(--neon)); }
+        /* ... (reste du CSS identique) ... */
+    
+    .tron-text::after {
+        content: "Up-T"; position: absolute; left: 0; top: 0;
+        width: 100%; height: 100%; color: var(--neon);
+        overflow: hidden; clip-path: inset(0 100% 0 0);
+        animation: fill-text 1.2s ease-in forwards, white-out 0.3s 1.2s forwards;
+        text-shadow: 0 0 20px var(--neon);
+    }
+
+    @keyframes fill-text { to { clip-path: inset(0 0 0 0); } }
+
+    /* Le passage au blanc électrique */
+    @keyframes white-out {
+        to { color: #ffffff; text-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff; filter: brightness(2); }
+    }
+    
+    .shock-active { animation: shock 0.5s ease-out forwards; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
 </head>
@@ -145,6 +163,21 @@
             document.getElementById('main-viewport').style.transform = `translateX(${-i*100}vw)`;
             document.querySelectorAll('.nav-item').forEach((n,idx) => n.classList.toggle('active', idx===i));
         };
+        // --- SPLASH ANIMATION ACCÉLÉRÉE ---
+    setTimeout(() => {
+        const shock = document.getElementById('shock');
+        shock.classList.add('shock-active');
+        
+        // On fait disparaître le splash juste au pic de blancheur
+        setTimeout(() => {
+            const screen = document.getElementById('splash-screen');
+            screen.style.opacity = '0';
+            setTimeout(() => {
+                screen.style.display = 'none';
+                document.getElementById('app-content').classList.add('ready');
+            }, 300);
+        }, 200); 
+    }, 1800); // Déclenchement rapide après le dessin des lettres
     </script>
 </body>
 </html>
