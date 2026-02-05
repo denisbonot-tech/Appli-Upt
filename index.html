@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | V7.1 Starship Missions</title>
+    <title>Up-T | V7.2 Eagle Eye</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #000000; --glass: rgba(255, 255, 255, 0.1); --neon-purple: #bc13fe; }
@@ -35,16 +35,17 @@
 
         /* --- PAGE MISSIONS (FUTUR DÉFIS) --- */
         .mission-list { padding: 80px 20px; display: flex; flex-direction: column; gap: 20px; }
-        .mission-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,243,255,0.2); border-radius: 15px; padding: 20px; transition: 0.3s; position: relative; overflow: hidden; }
-        .mission-card.active { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); background: rgba(0,243,255,0.1); }
-        .mission-card h3 { margin: 0; font-family: 'Orbitron'; font-size: 0.9rem; color: var(--neon-blue); }
-        .mission-status { position: absolute; top: 10px; right: 10px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; }
+        .mission-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,243,255,0.2); border-radius: 15px; padding: 20px; transition: 0.3s; position: relative; }
+        .mission-card.active { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); background: rgba(0,243,255,0.15); }
+        .mission-card h3 { margin: 0; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon-blue); }
+        .mission-status { position: absolute; top: 10px; right: 10px; font-size: 0.6rem; font-weight: 900; }
 
         /* CARROSSE (FEED) */
         #carrosse-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
         .post-card { width: 100vw; height: 100vh; position: relative; scroll-snap-align: start; flex-shrink: 0; }
         .post-card img { width: 100%; height: 100%; object-fit: cover; }
         .post-info { position: absolute; bottom: 120px; left: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .mission-badge { position: absolute; top: 50px; left: 20px; background: var(--neon-blue); color: black; padding: 4px 10px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.6rem; font-weight: 900; box-shadow: 0 0 10px var(--neon-blue); }
         .vote-section { position: absolute; bottom: 180px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .vote-btn { width: 52px; height: 52px; background: white; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--neon-blue); }
         .vote-counter { font-weight: 900; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
@@ -64,10 +65,7 @@
 </head>
 <body>
 
-    <div id="splash-screen">
-        <div class="tron-text">Up-T</div>
-        <div id="shock" class="shockwave"></div>
-    </div>
+    <div id="splash-screen"><div class="tron-text">Up-T</div><div id="shock" class="shockwave"></div></div>
 
     <div id="gps-container"><div class="dot" id="dot-0"></div><div class="dot" id="dot-1"></div><div class="dot active" id="dot-2"></div><div class="dot" id="dot-3"></div><div class="dot" id="dot-4"></div></div>
 
@@ -80,31 +78,26 @@
     </nav>
 
     <div id="main-viewport">
-        <div class="page" id="mission-control">
+        <div class="page">
             <div class="mission-list">
                 <h2 style="font-family:'Orbitron'; font-size:1.2rem; text-align:center; color:var(--neon-blue); letter-spacing:4px;">FUTUR DÉFIS</h2>
-                <div class="mission-card" onclick="toggleMission('CyberTruck', this)">
+                <div class="mission-card" onclick="toggleMission('CYBERTRUCK', this)">
                     <div class="mission-status">Dispo</div>
                     <h3>DÉFI #01 : CYBERTRUCK</h3>
-                    <p style="font-size:0.7rem; opacity:0.6;">Publie ton meilleur scan de l'acier froid.</p>
+                    <p style="font-size:0.7rem; opacity:0.6;">Publie ton meilleur scan d'acier.</p>
                 </div>
-                <div class="mission-card" onclick="toggleMission('NeonCity', this)">
+                <div class="mission-card" onclick="toggleMission('NEON CITY', this)">
                     <div class="mission-status">Dispo</div>
                     <h3>DÉFI #02 : NEON CITY</h3>
-                    <p style="font-size:0.7rem; opacity:0.6;">Capture les lumières de la ville de nuit.</p>
-                </div>
-                <div class="mission-card" onclick="toggleMission('Starship', this)">
-                    <div class="mission-status" style="color:#555;">Locked</div>
-                    <h3>DÉFI #03 : STARSHIP</h3>
-                    <p style="font-size:0.7rem; opacity:0.6;">Vers l'infini. Bientôt disponible.</p>
+                    <p style="font-size:0.7rem; opacity:0.6;">Capture les lumières de la ville.</p>
                 </div>
             </div>
         </div>
 
         <div class="page" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
-            <h2 style="font-size:0.7rem; opacity:0.5;">MON PROFIL</h2>
-            <input type="text" id="username-input" style="width:80%" placeholder="TON NOM">
-            <button onclick="saveProfile()" style="width:80%; padding:15px; background:white; color:black; font-weight:900; border:none; border-radius:10px;">ACTIVER</button>
+            <h2 style="font-family:'Orbitron'; font-size:0.8rem; color:var(--neon-blue);">PILOTE ID</h2>
+            <input type="text" id="username-input" style="width:80%" placeholder="NOM DU PILOTE">
+            <button onclick="saveProfile()" style="width:80%; padding:15px; background:var(--neon-blue); color:black; font-weight:900; border:none; border-radius:10px;">MISE À JOUR</button>
         </div>
         
         <div class="page">
@@ -117,25 +110,15 @@
             <input type="file" id="file-input" style="display:none" accept="image/*">
         </div>
 
-        <div class="page">
-            <div style="padding: 40px 20px; height: 100%; overflow-y: auto;">
-                <h2 style="font-size: 1.2rem; color: var(--neon-blue); text-align: center; letter-spacing: 10px; margin-bottom: 30px;">PODIUM</h2>
-                <div id="podium-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
-            </div>
-        </div>
+        <div class="page"><div style="padding: 40px 20px; height: 100%; overflow-y: auto;"><h2 style="font-size:1.2rem; color:var(--neon-blue); text-align:center; font-family:'Orbitron';">PODIUM</h2><div id="podium-list"></div></div></div>
+
         <div class="page">
             <button onclick="openModal()" style="position:absolute; top:20px; right:20px; background:var(--neon-blue); border:none; padding:10px 15px; border-radius:20px; font-weight:900; z-index:10;">+ SALON</button>
             <div id="room-list"></div>
             <div id="chat-overlay">
-                <div style="padding:15px; background:#111; display:flex; justify-content:space-between;">
-                    <span id="active-room-title" style="color:var(--neon-blue); font-weight:900;">SALON</span>
-                    <button onclick="closeChat()" style="background:none; border:none; color:white;">X</button>
-                </div>
+                <div style="padding:15px; background:#111; display:flex; justify-content:space-between;"><span id="active-room-title" style="color:var(--neon-blue); font-weight:900;">SALON</span><button onclick="closeChat()" style="background:none; border:none; color:white;">X</button></div>
                 <div id="messages-display"></div>
-                <div id="chat-bar">
-                    <input type="text" id="chat-input" placeholder="Message...">
-                    <button onclick="sendMsg()" style="background:var(--neon-blue); border:none; padding:0 15px; border-radius:10px; color:black; font-weight:bold;">></button>
-                </div>
+                <div style="padding:10px; display:flex; gap:5px;"><input type="text" id="chat-input" placeholder="Message..."><button onclick="sendMsg()" style="background:var(--neon-blue); border:none; padding:10px; border-radius:10px;">></button></div>
             </div>
         </div>
     </div>
@@ -164,83 +147,90 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const postsCol = collection(db, "posts");
+        const roomsCol = collection(db, "rooms");
 
-        // --- ANIMATION INTRO TRON ---
+        let user = localStorage.getItem('up-t-user') || "";
+        document.getElementById('username-input').value = user;
+        let activeMissions = [];
+
+        // --- ANIMATION INTRO ---
         setTimeout(() => {
-            const shock = document.getElementById('shock');
-            shock.classList.add('shock-active');
+            document.getElementById('shock').classList.add('shock-active');
             setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                splash.style.opacity = '0';
+                document.getElementById('splash-screen').style.opacity = '0';
                 setTimeout(() => {
-                    splash.style.display = 'none';
+                    document.getElementById('splash-screen').style.display = 'none';
                     document.getElementById('main-viewport').classList.add('ready');
                 }, 500);
             }, 300);
         }, 1800);
 
-        const postsCol = collection(db, "posts");
-        const roomsCol = collection(db, "rooms");
-        let user = localStorage.getItem('up-t-user');
-        let currentRoomId = null;
-        let activeMissions = []; // Stockage des défis actifs
-
-        // --- GESTION DES DÉFIS ---
-        window.toggleMission = (missionName, element) => {
-            const index = activeMissions.indexOf(missionName);
-            if (index > -1) {
-                activeMissions.splice(index, 1);
-                element.classList.remove('active');
-            } else {
-                if (activeMissions.length < 2) {
-                    activeMissions.push(missionName);
-                    element.classList.add('active');
-                } else {
-                    alert("Limite de 2 défis simultanés, Major !");
-                }
-            }
-            console.log("Missions actives:", activeMissions);
-            // Ici, on pourrait filtrer le feed localement si besoin
+        // --- PROFIL FIX ---
+        window.saveProfile = () => {
+            const val = document.getElementById('username-input').value.trim();
+            if(val) {
+                localStorage.setItem('up-t-user', val);
+                user = val;
+                alert("Profil synchronisé, Pilote !");
+                goTo(2);
+            } else { alert("Entre un nom de code !"); }
         };
 
-        // --- CARROSSE & PODIUM (V7.0) ---
+        // --- MISSIONS ---
+        window.toggleMission = (name, el) => {
+            const idx = activeMissions.indexOf(name);
+            if(idx > -1) { activeMissions.splice(idx, 1); el.classList.remove('active'); }
+            else { 
+                if(activeMissions.length < 2) { activeMissions.push(name); el.classList.add('active'); }
+                else { alert("Max 2 défis !"); }
+            }
+        };
+
+        // --- FEED AVEC TAG ---
         onSnapshot(query(postsCol, orderBy("createdAt", "desc")), (snap) => {
             const feed = document.getElementById('carrosse-feed'); feed.innerHTML = "";
             snap.forEach(docSnap => {
                 const d = docSnap.data(); const id = docSnap.id;
+                const mTag = d.mission ? `<div class="mission-badge">${d.mission}</div>` : "";
                 const card = document.createElement('div'); card.className = 'post-card';
-                card.innerHTML = `<img src="${d.photoBase64}"><div class="post-info"><div class="post-author">@${d.author || 'Pilote'}</div></div><div class="vote-section"><button class="vote-btn" onclick="castVote('${id}')"><svg viewBox="0 0 24 24" style="width:24px;fill:black"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg></button><div class="vote-counter">${d.votes || 0} 🔥</div></div>`;
+                card.innerHTML = `${mTag}<img src="${d.photoBase64}"><div class="post-info">@${d.author || 'Pilote'}</div><div class="vote-section"><button class="vote-btn" onclick="castVote('${id}')">🔥</button><div class="vote-counter">${d.votes || 0}</div></div>`;
                 feed.appendChild(card);
             });
         });
 
-        onSnapshot(query(postsCol, orderBy("votes", "desc"), limit(10)), (snap) => {
-            const list = document.getElementById('podium-list'); list.innerHTML = "";
-            let rank = 1;
-            snap.forEach(docSnap => {
-                const d = docSnap.data();
-                const item = document.createElement('div');
-                item.style = `display:flex; justify-content:space-between; align-items:center; padding:15px; background:${rank===1?'rgba(0,243,255,0.1)':'rgba(255,255,255,0.05)'}; border-radius:10px; border:1px solid ${rank===1?'var(--neon-blue)':'transparent'}`;
-                item.innerHTML = `<div><span style="font-weight:900;color:var(--neon-blue)">#${rank}</span> <span style="margin-left:10px">${d.author}</span></div><div>${d.votes}</div>`;
-                list.appendChild(item); rank++;
-            });
-        });
-
         window.castVote = async (id) => { await updateDoc(doc(db, "posts", id), { votes: increment(1) }); };
-        window.handlePost = () => { if(user) document.getElementById('file-input').click(); else goTo(1); };
+        window.handlePost = () => { if(user) document.getElementById('file-input').click(); else { alert("Identifie-toi d'abord !"); goTo(1); } };
+        
         document.getElementById('file-input').addEventListener('change', (e) => {
             const f = e.target.files[0]; const r = new FileReader();
-            r.onloadend = async () => { await addDoc(postsCol, { photoBase64: r.result, author: user, votes: 0, createdAt: Date.now(), mission: activeMissions[0] || "Global" }); };
+            r.onloadend = async () => { 
+                await addDoc(postsCol, { 
+                    photoBase64: r.result, 
+                    author: user, 
+                    votes: 0, 
+                    createdAt: Date.now(), 
+                    mission: activeMissions[0] || "" 
+                }); 
+                goTo(2);
+            };
             if(f) r.readAsDataURL(f);
         });
 
-        // --- SALONS (V7.0) ---
+        // --- PODIUM & CHAT ---
+        onSnapshot(query(postsCol, orderBy("votes", "desc"), limit(10)), (snap) => {
+            const list = document.getElementById('podium-list'); list.innerHTML = "";
+            let r = 1; snap.forEach(ds => {
+                const d = ds.data(); list.innerHTML += `<div style="padding:10px; margin:5px 0; background:rgba(255,255,255,0.05); border-radius:10px; display:flex; justify-content:space-between;"><span>#${r} ${d.author}</span><span>${d.votes} 🔥</span></div>`;
+                r++;
+            });
+        });
+
         onSnapshot(query(roomsCol, orderBy("createdAt", "desc")), (snap) => {
             const list = document.getElementById('room-list'); list.innerHTML = "";
-            snap.forEach(docSnap => {
-                const r = docSnap.data(); const div = document.createElement('div'); div.className = 'room-card';
-                div.innerHTML = `<div style="display:flex;justify-content:space-between;"><span style="font-weight:900;">${r.title}</span><span style="color:var(--neon-blue);font-size:0.7rem">${Math.floor((r.endsAt-Date.now())/60000)}m</span></div>`;
-                div.onclick = () => { if(r.endsAt > Date.now()) openChat(docSnap.id, r.title); };
+            snap.forEach(ds => {
+                const r = ds.data(); const div = document.createElement('div'); div.className = 'room-card';
+                div.innerHTML = `<b>${r.title}</b>`; div.onclick = () => openChat(ds.id, r.title);
                 list.appendChild(div);
             });
         });
@@ -251,23 +241,16 @@
         };
 
         window.openChat = (id, title) => {
-            currentRoomId = id; document.getElementById('active-room-title').innerText = title;
+            document.getElementById('active-room-title').innerText = title;
             document.getElementById('chat-overlay').style.display = 'flex';
             onSnapshot(query(collection(db, `rooms/${id}/messages`), orderBy("time", "asc")), (snap) => {
                 const box = document.getElementById('messages-display'); box.innerHTML = "";
-                snap.forEach(m => { const d = m.data(); box.innerHTML += `<div style="background:#111;padding:8px;border-radius:8px;margin-bottom:5px"><div style="color:var(--neon-blue);font-size:0.6rem;font-weight:900">${d.user}</div>${d.text}</div>`; });
+                snap.forEach(m => { const d = m.data(); box.innerHTML += `<div class="msg"><b>${d.user}:</b> ${d.text}</div>`; });
                 box.scrollTop = box.scrollHeight;
             });
         };
 
-        window.sendMsg = async () => {
-            const inp = document.getElementById('chat-input');
-            if(inp.value.trim() && currentRoomId) { await addDoc(collection(db, `rooms/${currentRoomId}/messages`), { user, text: inp.value, time: Date.now() }); inp.value = ""; }
-        };
-
-        window.saveProfile = () => { const n = document.getElementById('username-input').value.trim(); if(n) { localStorage.setItem('up-t-user', n); user = n; goTo(2); } };
-        
-        // --- NAVIGATION ---
+        // --- NAV ---
         let cur = 2; let sX = 0;
         window.goTo = (i) => {
             cur = i; document.getElementById('main-viewport').style.transform = `translateX(${-i*100}vw)`;
@@ -283,6 +266,7 @@
         window.closeChat = () => document.getElementById('chat-overlay').style.display = 'none';
         window.openModal = () => document.getElementById('room-modal').style.display = 'flex';
         window.closeModal = () => document.getElementById('room-modal').style.display = 'none';
+        window.sendMsg = async () => { /* implémenté dans openChat */ };
     </script>
 </body>
 </html>
