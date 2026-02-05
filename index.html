@@ -1,9 +1,15 @@
+Écoute, Major, hors de question de te laisser faire de la soudure à l'aveugle dans le cockpit. On ne rigole pas avec le code source d'un Starship. Je vais te donner le système complet, clé en main.
+
+J'ai fusionné la V7.3 avec ton moteur stable. Le podium est maintenant segmenté : en haut, les défis que tu as activés, en bas, les archives des missions terminées (ou globales).
+🛰️ V7.3 - MISSION CONTROL FULL CODE
+HTML
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | V7.2 Eagle Eye</title>
+    <title>Up-T | V7.3 Mission Control</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #000000; --glass: rgba(255, 255, 255, 0.1); --neon-purple: #bc13fe; }
@@ -33,34 +39,35 @@
         #main-viewport.ready { opacity: 1; }
         .page { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; overflow: hidden; }
 
-        /* --- PAGE MISSIONS (FUTUR DÉFIS) --- */
+        /* --- MISSIONS --- */
         .mission-list { padding: 80px 20px; display: flex; flex-direction: column; gap: 20px; }
         .mission-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,243,255,0.2); border-radius: 15px; padding: 20px; transition: 0.3s; position: relative; }
         .mission-card.active { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); background: rgba(0,243,255,0.15); }
         .mission-card h3 { margin: 0; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon-blue); }
-        .mission-status { position: absolute; top: 10px; right: 10px; font-size: 0.6rem; font-weight: 900; }
 
-        /* CARROSSE (FEED) */
+        /* FEED */
         #carrosse-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
         .post-card { width: 100vw; height: 100vh; position: relative; scroll-snap-align: start; flex-shrink: 0; }
         .post-card img { width: 100%; height: 100%; object-fit: cover; }
-        .post-info { position: absolute; bottom: 120px; left: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        .mission-badge { position: absolute; top: 50px; left: 20px; background: var(--neon-blue); color: black; padding: 4px 10px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.6rem; font-weight: 900; box-shadow: 0 0 10px var(--neon-blue); }
+        .mission-badge { position: absolute; top: 50px; left: 20px; background: var(--neon-blue); color: black; padding: 4px 10px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.6rem; font-weight: 900; box-shadow: 0 0 10px var(--neon-blue); z-index: 10; }
         .vote-section { position: absolute; bottom: 180px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .vote-btn { width: 52px; height: 52px; background: white; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--neon-blue); }
+        .vote-btn { width: 52px; height: 52px; background: white; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--neon-blue); font-size: 1.5rem; }
         .vote-counter { font-weight: 900; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
 
-        /* CHAT & SALONS */
+        /* PODIUM STYLING */
+        .podium-section-title { font-size: 0.7rem; color: var(--neon-blue); font-weight: 900; border-bottom: 1px solid var(--neon-blue); margin: 25px 0 10px 0; padding-bottom: 5px; font-family: 'Orbitron'; text-transform: uppercase; }
+        .podium-row { padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* CHAT */
         #room-list { flex: 1; overflow-y: auto; padding: 20px; padding-top: 80px; display: flex; flex-direction: column; gap: 12px; }
         .room-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 4px solid var(--neon-blue); }
         #chat-overlay { display: none; position: absolute; inset: 0; background: black; z-index: 1005; flex-direction: column; }
         #messages-display { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #222; }
 
         /* MODALS */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
-        input { width: 100%; padding: 15px; background: #111; border: 1px solid #333; color: white; margin-bottom: 10px; border-radius: 10px; text-align: center; box-sizing: border-box; }
-        .fab { width: 56px; height: 56px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: none; cursor: pointer; }
+        input { width: 100%; padding: 15px; background: #111; border: 1px solid #333; color: white; margin-bottom: 10px; border-radius: 10px; text-align: center; }
+        .fab { width: 56px; height: 56px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: none; }
     </style>
 </head>
 <body>
@@ -82,13 +89,13 @@
             <div class="mission-list">
                 <h2 style="font-family:'Orbitron'; font-size:1.2rem; text-align:center; color:var(--neon-blue); letter-spacing:4px;">FUTUR DÉFIS</h2>
                 <div class="mission-card" onclick="toggleMission('CYBERTRUCK', this)">
-                    <div class="mission-status">Dispo</div>
-                    <h3>DÉFI #01 : CYBERTRUCK</h3>
+                    <div style="position:absolute; top:10px; right:10px; font-size:0.6rem; font-weight:900;">DÉFI #01</div>
+                    <h3>CYBERTRUCK</h3>
                     <p style="font-size:0.7rem; opacity:0.6;">Publie ton meilleur scan d'acier.</p>
                 </div>
                 <div class="mission-card" onclick="toggleMission('NEON CITY', this)">
-                    <div class="mission-status">Dispo</div>
-                    <h3>DÉFI #02 : NEON CITY</h3>
+                    <div style="position:absolute; top:10px; right:10px; font-size:0.6rem; font-weight:900;">DÉFI #02</div>
+                    <h3>NEON CITY</h3>
                     <p style="font-size:0.7rem; opacity:0.6;">Capture les lumières de la ville.</p>
                 </div>
             </div>
@@ -110,7 +117,13 @@
             <input type="file" id="file-input" style="display:none" accept="image/*">
         </div>
 
-        <div class="page"><div style="padding: 40px 20px; height: 100%; overflow-y: auto;"><h2 style="font-size:1.2rem; color:var(--neon-blue); text-align:center; font-family:'Orbitron';">PODIUM</h2><div id="podium-list"></div></div></div>
+        <div class="page">
+            <div style="padding: 40px 20px; height: 100%; overflow-y: auto;">
+                <h2 style="font-size:1.2rem; color:var(--neon-blue); text-align:center; font-family:'Orbitron'; letter-spacing:5px;">PODIUMS</h2>
+                <div id="podium-active-missions"></div>
+                <div id="podium-archive-missions"></div>
+            </div>
+        </div>
 
         <div class="page">
             <button onclick="openModal()" style="position:absolute; top:20px; right:20px; background:var(--neon-blue); border:none; padding:10px 15px; border-radius:20px; font-weight:900; z-index:10;">+ SALON</button>
@@ -151,10 +164,10 @@
         const roomsCol = collection(db, "rooms");
 
         let user = localStorage.getItem('up-t-user') || "";
+        let activeMissions = []; 
         document.getElementById('username-input').value = user;
-        let activeMissions = [];
 
-        // --- ANIMATION INTRO ---
+        // --- INTRO ---
         setTimeout(() => {
             document.getElementById('shock').classList.add('shock-active');
             setTimeout(() => {
@@ -166,18 +179,15 @@
             }, 300);
         }, 1800);
 
-        // --- PROFIL FIX ---
-        window.saveProfile = () => {
-            const val = document.getElementById('username-input').value.trim();
-            if(val) {
-                localStorage.setItem('up-t-user', val);
-                user = val;
-                alert("Profil synchronisé, Pilote !");
-                goTo(2);
-            } else { alert("Entre un nom de code !"); }
+        // --- NAVIGATION ---
+        let cur = 2; let sX = 0;
+        window.goTo = (i) => {
+            cur = i; document.getElementById('main-viewport').style.transform = `translateX(${-i*100}vw)`;
+            document.querySelectorAll('.dot').forEach((d,idx) => d.classList.toggle('active', idx===i));
+            document.querySelectorAll('.nav-item').forEach((n,idx) => n.classList.toggle('active', idx===i));
         };
 
-        // --- MISSIONS ---
+        // --- GESTION MISSIONS ---
         window.toggleMission = (name, el) => {
             const idx = activeMissions.indexOf(name);
             if(idx > -1) { activeMissions.splice(idx, 1); el.classList.remove('active'); }
@@ -187,44 +197,59 @@
             }
         };
 
-        // --- FEED AVEC TAG ---
+        // --- FEED & VOTE ---
         onSnapshot(query(postsCol, orderBy("createdAt", "desc")), (snap) => {
             const feed = document.getElementById('carrosse-feed'); feed.innerHTML = "";
-            snap.forEach(docSnap => {
-                const d = docSnap.data(); const id = docSnap.id;
-                const mTag = d.mission ? `<div class="mission-badge">${d.mission}</div>` : "";
+            snap.forEach(ds => {
+                const d = ds.data(); const mTag = d.mission ? `<div class="mission-badge">${d.mission}</div>` : "";
                 const card = document.createElement('div'); card.className = 'post-card';
-                card.innerHTML = `${mTag}<img src="${d.photoBase64}"><div class="post-info">@${d.author || 'Pilote'}</div><div class="vote-section"><button class="vote-btn" onclick="castVote('${id}')">🔥</button><div class="vote-counter">${d.votes || 0}</div></div>`;
+                card.innerHTML = `${mTag}<img src="${d.photoBase64}"><div class="post-info">@${d.author || 'Pilote'}</div><div class="vote-section"><button class="vote-btn" onclick="castVote('${ds.id}')">🔥</button><div class="vote-counter">${d.votes || 0}</div></div>`;
                 feed.appendChild(card);
             });
         });
 
         window.castVote = async (id) => { await updateDoc(doc(db, "posts", id), { votes: increment(1) }); };
-        window.handlePost = () => { if(user) document.getElementById('file-input').click(); else { alert("Identifie-toi d'abord !"); goTo(1); } };
+        window.handlePost = () => { if(user) document.getElementById('file-input').click(); else { alert("Identifie-toi !"); goTo(1); }};
         
         document.getElementById('file-input').addEventListener('change', (e) => {
             const f = e.target.files[0]; const r = new FileReader();
             r.onloadend = async () => { 
-                await addDoc(postsCol, { 
-                    photoBase64: r.result, 
-                    author: user, 
-                    votes: 0, 
-                    createdAt: Date.now(), 
-                    mission: activeMissions[0] || "" 
-                }); 
+                await addDoc(postsCol, { photoBase64: r.result, author: user, votes: 0, createdAt: Date.now(), mission: activeMissions[0] || "" }); 
                 goTo(2);
             };
             if(f) r.readAsDataURL(f);
         });
 
-        // --- PODIUM & CHAT ---
-        onSnapshot(query(postsCol, orderBy("votes", "desc"), limit(10)), (snap) => {
-            const list = document.getElementById('podium-list'); list.innerHTML = "";
-            let r = 1; snap.forEach(ds => {
-                const d = ds.data(); list.innerHTML += `<div style="padding:10px; margin:5px 0; background:rgba(255,255,255,0.05); border-radius:10px; display:flex; justify-content:space-between;"><span>#${r} ${d.author}</span><span>${d.votes} 🔥</span></div>`;
-                r++;
+        // --- PODIUM SEGMENTÉ V7.3 ---
+        onSnapshot(query(postsCol, orderBy("votes", "desc")), (snap) => {
+            const activeC = document.getElementById('podium-active-missions');
+            const archiveC = document.getElementById('podium-archive-missions');
+            activeC.innerHTML = ""; archiveC.innerHTML = "";
+            let boards = {};
+            snap.forEach(ds => {
+                const d = ds.data(); const m = d.mission || "GLOBAL";
+                if(!boards[m]) boards[m] = [];
+                if(boards[m].length < 5) boards[m].push(d);
+            });
+            Object.keys(boards).forEach(mission => {
+                const isArchive = !activeMissions.includes(mission) && mission !== "GLOBAL";
+                let html = `<div class="podium-section-title">MISSION: ${mission}</div>`;
+                boards[mission].forEach((d, i) => {
+                    html += `<div class="podium-row"><span>#${i+1} ${d.author}</span><span style="color:var(--neon-blue)">${d.votes} 🔥</span></div>`;
+                });
+                if(isArchive) archiveC.innerHTML += html; else activeC.innerHTML += html;
             });
         });
+
+        // --- PROFIL & CHAT (RESTANTS) ---
+        window.saveProfile = () => {
+            const val = document.getElementById('username-input').value.trim();
+            if(val) { localStorage.setItem('up-t-user', val); user = val; alert("Profil OK !"); goTo(2); }
+        };
+
+        window.openModal = () => document.getElementById('room-modal').style.display = 'flex';
+        window.closeModal = () => document.getElementById('room-modal').style.display = 'none';
+        window.closeChat = () => document.getElementById('chat-overlay').style.display = 'none';
 
         onSnapshot(query(roomsCol, orderBy("createdAt", "desc")), (snap) => {
             const list = document.getElementById('room-list'); list.innerHTML = "";
@@ -235,38 +260,32 @@
             });
         });
 
+        let currentRoomId = null;
+        window.openChat = (id, title) => {
+            currentRoomId = id; document.getElementById('active-room-title').innerText = title;
+            document.getElementById('chat-overlay').style.display = 'flex';
+            onSnapshot(query(collection(db, `rooms/${id}/messages`), orderBy("time", "asc")), (snap) => {
+                const box = document.getElementById('messages-display'); box.innerHTML = "";
+                snap.forEach(m => { const d = m.data(); box.innerHTML += `<div style="background:#111;padding:8px;border-radius:8px;margin-bottom:5px"><b>${d.user}:</b> ${d.text}</div>`; });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        window.sendMsg = async () => {
+            const inp = document.getElementById('chat-input');
+            if(inp.value.trim() && currentRoomId) { await addDoc(collection(db, `rooms/${currentRoomId}/messages`), { user, text: inp.value, time: Date.now() }); inp.value = ""; }
+        };
+
         window.createRoom = async () => {
             const t = document.getElementById('room-title-in').value; const d = parseInt(document.getElementById('room-timer-in').value);
             if(t && d && user) { await addDoc(roomsCol, { title: t, author: user, createdAt: Date.now(), endsAt: Date.now() + (d * 60000) }); closeModal(); }
         };
 
-        window.openChat = (id, title) => {
-            document.getElementById('active-room-title').innerText = title;
-            document.getElementById('chat-overlay').style.display = 'flex';
-            onSnapshot(query(collection(db, `rooms/${id}/messages`), orderBy("time", "asc")), (snap) => {
-                const box = document.getElementById('messages-display'); box.innerHTML = "";
-                snap.forEach(m => { const d = m.data(); box.innerHTML += `<div class="msg"><b>${d.user}:</b> ${d.text}</div>`; });
-                box.scrollTop = box.scrollHeight;
-            });
-        };
-
-        // --- NAV ---
-        let cur = 2; let sX = 0;
-        window.goTo = (i) => {
-            cur = i; document.getElementById('main-viewport').style.transform = `translateX(${-i*100}vw)`;
-            document.querySelectorAll('.dot').forEach((d,idx) => d.classList.toggle('active', idx===i));
-            document.querySelectorAll('.nav-item').forEach((n,idx) => n.classList.toggle('active', idx===i));
-        };
         window.addEventListener('touchstart', e => sX = e.touches[0].clientX);
         window.addEventListener('touchend', e => {
             let dx = sX - e.changedTouches[0].clientX;
             if(Math.abs(dx) > 70) { if(dx > 0 && cur < 4) goTo(cur + 1); else if(dx < 0 && cur > 0) goTo(cur - 1); }
         });
-
-        window.closeChat = () => document.getElementById('chat-overlay').style.display = 'none';
-        window.openModal = () => document.getElementById('room-modal').style.display = 'flex';
-        window.closeModal = () => document.getElementById('room-modal').style.display = 'none';
-        window.sendMsg = async () => { /* implémenté dans openChat */ };
     </script>
 </body>
 </html>
