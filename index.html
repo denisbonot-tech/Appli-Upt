@@ -3,22 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Up-T | V7.7 Switch Podium</title>
+    <title>Up-T | V7.8 Time-Lock</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
     <style>
         :root { --neon-blue: #00f3ff; --bg-dark: #000000; --glass: rgba(255, 255, 255, 0.1); }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: var(--bg-dark); font-family: 'Inter', sans-serif; color: white; }
 
-        /* INTRO */
+        /* INTRO & UI */
         #splash-screen { position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
         .tron-text { font-family: 'Orbitron', sans-serif; font-size: 60px; font-weight: 900; color: transparent; -webkit-text-stroke: 1px var(--neon-blue); letter-spacing: 8px; position: relative; }
         .tron-text::after { content: "Up-T"; position: absolute; left: 0; top: 0; width: 100%; height: 100%; color: var(--neon-blue); overflow: hidden; clip-path: inset(0 100% 0 0); animation: fill-text 1.2s ease-in forwards; text-shadow: 0 0 20px var(--neon-blue); }
         @keyframes fill-text { to { clip-path: inset(0 0 0 0); } }
-        .shockwave { position: absolute; width: 10px; height: 10px; background: white; border-radius: 50%; opacity: 0; }
-        .shock-active { animation: shock 0.5s ease-out forwards; }
-        @keyframes shock { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(100); opacity: 0; } }
-
-        /* NAV UI */
         #gps-container { position: fixed; bottom: 55px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 1001; pointer-events: none; }
         .dot { width: 5px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 50%; transition: 0.4s; }
         .dot.active { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); transform: scale(1.3); }
@@ -27,18 +22,18 @@
         .nav-item.active { opacity: 1; color: var(--neon-blue); }
         .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
 
-        /* VIEWPORT */
+        /* VIEWPORT & PAGES */
         #main-viewport { display: flex; width: 500vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1); transform: translateX(-200vw); opacity: 0; }
         #main-viewport.ready { opacity: 1; }
         .page { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; overflow: hidden; }
 
         /* MISSIONS */
         .mission-list { padding: 80px 20px; display: flex; flex-direction: column; gap: 20px; }
-        .mission-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,243,255,0.2); border-radius: 15px; padding: 20px; transition: 0.3s; position: relative; }
+        .mission-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,243,255,0.2); border-radius: 15px; padding: 20px; transition: 0.3s; }
         .mission-card.active { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); background: rgba(0,243,255,0.15); }
         .mission-card h3 { margin: 0; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon-blue); }
 
-        /* FEED */
+        /* FEED TACTIQUE */
         #carrosse-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
         .post-card { width: 100vw; height: 100vh; position: relative; scroll-snap-align: start; flex-shrink: 0; }
         .post-card img { width: 100%; height: 100%; object-fit: cover; }
@@ -48,13 +43,13 @@
         .vote-btn { width: 52px; height: 52px; background: white; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--neon-blue); font-size: 1.5rem; }
         .vote-counter { font-weight: 900; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
 
-        /* PODIUM SWITCHER (V7.7) */
+        /* PODIUM */
         .podium-header { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-bottom: 1px solid var(--neon-blue); padding-bottom: 10px; }
-        .switch-btn { background: none; border: 1px solid var(--neon-blue); color: var(--neon-blue); border-radius: 5px; padding: 5px 12px; font-family: 'Orbitron'; cursor: pointer; }
+        .switch-btn { background: none; border: 1px solid var(--neon-blue); color: var(--neon-blue); border-radius: 5px; padding: 5px 12px; font-family: 'Orbitron'; }
         .podium-section-title { font-size: 0.7rem; color: var(--neon-blue); font-weight: 900; font-family: 'Orbitron'; }
-        .podium-row { padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; border-left: 3px solid var(--neon-blue); }
+        .podium-row { padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--neon-blue); }
 
-        /* CHAT SYSTEM */
+        /* CHAT */
         #room-list { flex: 1; overflow-y: auto; padding: 20px; padding-top: 80px; display: flex; flex-direction: column; gap: 12px; }
         .room-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 4px solid var(--neon-blue); }
         #chat-overlay { display: none; position: absolute; inset: 0; background: black; z-index: 1005; flex-direction: column; }
@@ -63,15 +58,13 @@
         .msg-user { color: var(--neon-blue); font-size: 0.6rem; font-weight: 900; margin-bottom: 4px; font-family: 'Orbitron'; }
         #chat-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: #000; padding: 10px; display: flex; gap: 8px; border-top: 1px solid #222; }
 
-        /* INPUTS & MODALS */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
         input { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: white; margin-bottom: 10px; border-radius: 10px; text-align: center; }
         .fab { width: 56px; height: 56px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: none; }
     </style>
 </head>
 <body>
 
-    <div id="splash-screen"><div class="tron-text">Up-T</div><div id="shock" class="shockwave"></div></div>
+    <div id="splash-screen"><div class="tron-text">Up-T</div></div>
 
     <div id="gps-container"><div class="dot" id="dot-0"></div><div class="dot" id="dot-1"></div><div class="dot active" id="dot-2"></div><div class="dot" id="dot-3"></div><div class="dot" id="dot-4"></div></div>
 
@@ -86,22 +79,21 @@
     <div id="main-viewport">
         <div class="page">
             <div class="mission-list">
-                <h2 style="font-family:'Orbitron'; font-size:1.2rem; text-align:center; color:var(--neon-blue); letter-spacing:4px;">MISSIONS</h2>
+                <h2 style="font-family:'Orbitron'; text-align:center; color:var(--neon-blue);">DÉFIS</h2>
                 <div class="mission-card" onclick="toggleMission('DÉFI #01 : CYBERTRUCK', this)">
                     <h3>#01 CYBERTRUCK</h3>
-                    <p style="font-size:0.7rem; opacity:0.6;">Publie ton meilleur scan d'acier.</p>
+                    <p style="font-size:0.7rem; opacity:0.6;">Ouvert - 1 Semaine</p>
                 </div>
                 <div class="mission-card" onclick="toggleMission('DÉFI #02 : NEON CITY', this)">
                     <h3>#02 NEON CITY</h3>
-                    <p style="font-size:0.7rem; opacity:0.6;">Capture les lumières de la ville.</p>
+                    <p style="font-size:0.7rem; opacity:0.6;">Ouvert - 1 Semaine</p>
                 </div>
             </div>
         </div>
 
         <div class="page" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
-            <h2 style="font-family:'Orbitron'; font-size:0.8rem; color:var(--neon-blue);">PILOTE ID</h2>
             <input type="text" id="username-input" placeholder="NOM DU PILOTE">
-            <button onclick="saveProfile()" style="width:80%; padding:15px; background:var(--neon-blue); color:black; font-weight:900; border:none; border-radius:10px;">MISE À JOUR</button>
+            <button onclick="saveProfile()" style="width:80%; padding:15px; background:var(--neon-blue); color:black; font-weight:900; border:none; border-radius:10px;">SAUVEGARDER</button>
         </div>
         
         <div class="page">
@@ -116,65 +108,54 @@
 
         <div class="page">
             <div style="padding: 40px 20px; height: 100%; overflow-y: auto;">
-                <h2 style="font-size:1.1rem; color:var(--neon-blue); text-align:center; font-family:'Orbitron'; letter-spacing:5px;">CLASSEMENT</h2>
+                <h2 style="font-size:1.1rem; color:var(--neon-blue); text-align:center; font-family:'Orbitron';">PODIUMS</h2>
                 <div class="podium-header">
                     <button class="switch-btn" onclick="switchPodium(-1)"><</button>
-                    <div id="podium-mission-title" class="podium-section-title">MISSION</div>
+                    <div id="podium-mission-title" class="podium-section-title">CHART</div>
                     <button class="switch-btn" onclick="switchPodium(1)">></button>
                 </div>
                 <div id="podium-content"></div>
             </div>
         </div>
 
-        <div class="page">
-            <button onclick="openModal()" style="position:absolute; top:20px; right:20px; background:var(--neon-blue); border:none; padding:10px 15px; border-radius:20px; font-weight:900; z-index:10; color:black; font-size:0.7rem;">+ SALON</button>
-            <div id="room-list"></div>
-            <div id="chat-overlay">
-                <div style="padding:15px; background:#111; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222;">
-                    <span id="active-room-title" style="color:var(--neon-blue); font-weight:900; font-family:'Orbitron';">SALON</span>
-                    <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.2rem;">×</button>
-                </div>
-                <div id="messages-display"></div>
-                <div id="chat-bar"><input type="text" id="chat-input" placeholder="Transmission..."><button onclick="sendMsg()" style="background:var(--neon-blue); border:none; padding:0 15px; border-radius:10px; color:black; font-weight:900;">></button></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="room-modal" class="modal">
-        <h3 style="font-family:'Orbitron'; color:var(--neon-blue);">CANAL CHAT</h3>
-        <input type="text" id="room-title-in" placeholder="TITRE">
-        <input type="number" id="room-timer-in" placeholder="DURÉE (MIN)">
-        <button onclick="createRoom()" style="width:100%; padding:15px; background:var(--neon-blue); border:none; border-radius:10px; font-weight:900; color:black;">LANCER</button>
-        <button onclick="closeModal()" style="margin-top:15px; color:gray; background:none; border:none;">ANNULER</button>
+        <div class="page"><div id="room-list"></div><div id="chat-overlay">...</div></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, updateDoc, increment, onSnapshot, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, updateDoc, increment, onSnapshot, collection, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk", authDomain: "up-t-network.firebaseapp.com", projectId: "up-t-network", storageBucket: "up-t-network.firebasestorage.app", messagingSenderId: "1066469813456", appId: "1:1066469813456:web:4b660350832ea1d95702d5", measurementId: "G-7CSRYYCZWV" };
+        const firebaseConfig = { apiKey: "AIzaSyBIsxyL2jrrhvUpypSZqt4eakbZb2XR7Jk", authDomain: "up-t-network.firebaseapp.com", projectId: "up-t-network", storageBucket: "up-t-network.firebasestorage.app", messagingSenderId: "1066469813456", appId: "1:1066469813456:web:4b660350832ea1d95702d5" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
-        const postsCol = collection(db, "posts"); const roomsCol = collection(db, "rooms");
+        const postsCol = collection(db, "posts");
 
         let user = localStorage.getItem('up-t-user') || "";
         let activeMissions = []; 
         let podiumIndex = 0;
         let globalBoards = {};
 
-        // ANIMATION & NAV
-        setTimeout(() => { document.getElementById('shock').classList.add('shock-active'); setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; document.getElementById('main-viewport').classList.add('ready'); }, 800); }, 1800);
-        let cur = 2; let sX = 0;
+        // LISTE DES DÉFIS OFFICIELS (À mettre à jour selon tes besoins)
+        const OFFICIAL_CHALLENGES = ['DÉFI #01 : CYBERTRUCK', 'DÉFI #02 : NEON CITY'];
+
+        setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; document.getElementById('main-viewport').classList.add('ready'); }, 2000);
+        let cur = 2;
         window.goTo = (i) => { cur = i; document.getElementById('main-viewport').style.transform = `translateX(${-i*100}vw)`; document.querySelectorAll('.dot').forEach((d,idx) => d.classList.toggle('active', idx===i)); document.querySelectorAll('.nav-item').forEach((n,idx) => n.classList.toggle('active', idx===i)); };
 
-        // MISSIONS
-        window.toggleMission = (name, el) => { const idx = activeMissions.indexOf(name); if(idx > -1) { activeMissions.splice(idx, 1); el.classList.remove('active'); } else { if(activeMissions.length < 2) { activeMissions.push(name); el.classList.add('active'); } else { alert("Max 2 missions !"); } } renderPodium(); };
+        window.toggleMission = (name, el) => { const idx = activeMissions.indexOf(name); if(idx > -1) { activeMissions.splice(idx, 1); el.classList.remove('active'); } else { if(activeMissions.length < 2) { activeMissions.push(name); el.classList.add('active'); } } };
 
-        // FEED
+        // FEED AVEC FILTRE TEMPOREL (7 JOURS)
         onSnapshot(query(postsCol, orderBy("createdAt", "desc")), (snap) => {
             const feed = document.getElementById('carrosse-feed'); feed.innerHTML = "";
+            const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
+            const now = Date.now();
+
             snap.forEach(ds => {
                 const d = ds.data();
-                if (activeMissions.includes(d.mission)) {
+                const isRecent = (now - d.createdAt) < ONE_WEEK;
+                const isOfficial = OFFICIAL_CHALLENGES.includes(d.mission);
+
+                // On affiche si c'est une mission officielle ET que ça date de moins d'une semaine
+                if (isOfficial && isRecent) {
                     const card = document.createElement('div'); card.className = 'post-card';
                     card.innerHTML = `<div class="mission-badge">${d.mission}</div><img src="${d.photoBase64}"><div class="post-info">#${d.author || 'PILOTE'}</div><div class="vote-section"><button class="vote-btn" onclick="castVote('${ds.id}')">🔥</button><div class="vote-counter">${d.votes || 0}</div></div>`;
                     feed.appendChild(card);
@@ -182,12 +163,13 @@
             });
         });
 
-        // SWITCHER PODIUM LOGIC (V7.7)
+        // PODIUM
         onSnapshot(query(postsCol, orderBy("votes", "desc")), (snap) => {
             globalBoards = {};
+            const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
             snap.forEach(ds => { 
                 const d = ds.data(); 
-                if (activeMissions.includes(d.mission)) {
+                if (OFFICIAL_CHALLENGES.includes(d.mission) && (Date.now() - d.createdAt < ONE_WEEK)) {
                     if(!globalBoards[d.mission]) globalBoards[d.mission] = [];
                     if(globalBoards[d.mission].length < 10) globalBoards[d.mission].push(d);
                 }
@@ -196,8 +178,7 @@
         });
 
         window.switchPodium = (dir) => {
-            const keys = Object.keys(globalBoards);
-            if(keys.length === 0) return;
+            const keys = Object.keys(globalBoards); if(keys.length === 0) return;
             podiumIndex = (podiumIndex + dir + keys.length) % keys.length;
             renderPodium();
         };
@@ -206,13 +187,7 @@
             const container = document.getElementById('podium-content');
             const titleEl = document.getElementById('podium-mission-title');
             const keys = Object.keys(globalBoards);
-            
-            if(keys.length === 0 || !activeMissions.includes(keys[podiumIndex])) {
-                container.innerHTML = "<p style='text-align:center; opacity:0.5; margin-top:50px;'>AUCUNE MISSION ACTIVE</p>";
-                titleEl.innerText = "STANDBY";
-                return;
-            }
-
+            if(keys.length === 0) { titleEl.innerText = "NO DATA"; return; }
             const currentMission = keys[podiumIndex];
             titleEl.innerText = currentMission;
             let html = "";
@@ -223,38 +198,14 @@
         }
 
         window.castVote = async (id) => { await updateDoc(doc(db, "posts", id), { votes: increment(1) }); };
-        window.handlePost = () => { if(user && activeMissions.length > 0) document.getElementById('file-input').click(); else alert("Active une mission et identifie-toi !"); };
-        
+        window.handlePost = () => { if(user && activeMissions.length > 0) document.getElementById('file-input').click(); else alert("Active une mission !"); };
         document.getElementById('file-input').addEventListener('change', (e) => {
             const f = e.target.files[0]; const r = new FileReader();
             r.onloadend = async () => { await addDoc(postsCol, { photoBase64: r.result, author: user, votes: 0, createdAt: Date.now(), mission: activeMissions[0] }); goTo(2); };
             if(f) r.readAsDataURL(f);
         });
 
-        // CHAT & PROFIL
-        let currentRoomId = null; let unsubChat = null;
-        onSnapshot(query(roomsCol, orderBy("createdAt", "desc")), (snap) => {
-            const list = document.getElementById('room-list'); list.innerHTML = "";
-            snap.forEach(ds => { const r = ds.data(); const div = document.createElement('div'); div.className = 'room-card'; div.innerHTML = `<b>${r.title}</b>`; div.onclick = () => openChat(ds.id, r.title); list.appendChild(div); });
-        });
-        window.openChat = (id, title) => {
-            currentRoomId = id; document.getElementById('active-room-title').innerText = title; document.getElementById('chat-overlay').style.display = 'flex';
-            if(unsubChat) unsubChat();
-            unsubChat = onSnapshot(query(collection(db, `rooms/${id}/messages`), orderBy("time", "asc")), (snap) => {
-                const box = document.getElementById('messages-display'); box.innerHTML = "";
-                snap.forEach(m => { const d = m.data(); box.innerHTML += `<div class="msg-bubble"><div class="msg-user">#${d.user}</div>${d.text}</div>`; });
-                box.scrollTop = box.scrollHeight;
-            });
-        };
-        window.sendMsg = async () => { const inp = document.getElementById('chat-input'); if(inp.value.trim() && currentRoomId) { await addDoc(collection(db, `rooms/${currentRoomId}/messages`), { user, text: inp.value, time: Date.now() }); inp.value = ""; } };
-        window.closeChat = () => { document.getElementById('chat-overlay').style.display = 'none'; };
-        window.openModal = () => document.getElementById('room-modal').style.display = 'flex';
-        window.closeModal = () => document.getElementById('room-modal').style.display = 'none';
-        window.createRoom = async () => { const t = document.getElementById('room-title-in').value; if(t) { await addDoc(roomsCol, { title: t, author: user, createdAt: Date.now() }); closeModal(); } };
-        window.saveProfile = () => { const val = document.getElementById('username-input').value.trim(); if(val) { localStorage.setItem('up-t-user', val); user = val; alert("SYNC OK"); goTo(2); } };
-
-        window.addEventListener('touchstart', e => sX = e.touches[0].clientX);
-        window.addEventListener('touchend', e => { let dx = sX - e.changedTouches[0].clientX; if(Math.abs(dx) > 70) { if(dx > 0 && cur < 4) goTo(cur + 1); else if(dx < 0 && cur > 0) goTo(cur - 1); } });
+        window.saveProfile = () => { const val = document.getElementById('username-input').value.trim(); if(val) { localStorage.setItem('up-t-user', val); user = val; alert("SYNC"); } };
     </script>
 </body>
 </html>
